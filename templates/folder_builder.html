@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>폴더 만들기</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <a href="/" class="btn">메인</a>
+      <a href="/file-batch" class="btn">파일 여러개 만들기</a>
+    </div>
+
+    <header class="top">
+      <h1>폴더 만들기</h1>
+      <p class="sub">한 줄에 한 경로로 입력하세요. 슬래시로 하위폴더 표현합니다.</p>
+    </header>
+
+    <section class="panel">
+      <form method="POST" class="form">
+        <div class="field">
+          <label>ZIP 루트 폴더명</label>
+          <input name="root_name" type="text" value="folder_tree" />
+        </div>
+
+        <div class="field">
+          <label>폴더 트리 입력</label>
+          <textarea name="tree" rows="14" placeholder="예:
+docs
+docs/spec
+src
+src/app
+src/static/css
+src/static/js"></textarea>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" type="submit">폴더 ZIP 다운로드</button>
+        </div>
+
+        <p class="hint">
+          주석은 #으로 시작하면 무시됩니다. 예: # comment
+        </p>
+      </form>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>파일 여러개 만들기</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <a href="/" class="btn">메인</a>
+      <a href="/folder-builder" class="btn">폴더 만들기</a>
+    </div>
+
+    <header class="top">
+      <h1>파일 여러개 만들기</h1>
+      <p class="sub">파일 업로드 후, 생성할 파일명 목록을 입력하면 ZIP으로 내려받습니다.</p>
+    </header>
+
+    <section class="panel">
+      <form method="POST" enctype="multipart/form-data" class="form">
+        <div class="field">
+          <label>ZIP 루트 폴더명</label>
+          <input name="root_name" type="text" value="files" />
+        </div>
+
+        <div class="field">
+          <label>템플릿 파일 업로드 (드래그 가능)</label>
+          <div id="dropzone" class="dropzone">
+            <div class="dz-text">
+              여기에 파일을 드래그하거나 클릭해서 선택하세요.
+            </div>
+            <input id="fileInput" name="files" type="file" multiple />
+          </div>
+          <div id="fileList" class="filelist"></div>
+          <p class="hint">
+            템플릿 1개면 모든 파일명이 같은 내용으로 복제됩니다. 템플릿 여러개이고 파일명 개수와 같으면 순서대로 매칭합니다.
+          </p>
+        </div>
+
+        <div class="field">
+          <label>생성할 파일명 목록 (줄바꿈)</label>
+          <textarea name="names" rows="12" placeholder="예:
+A.txt
+B.txt
+C.txt
+folder1/readme.md"></textarea>
+          <p class="hint">주석은 #으로 시작하면 무시됩니다.</p>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" type="submit">파일 ZIP 다운로드</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>
