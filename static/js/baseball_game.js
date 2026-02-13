@@ -50,24 +50,53 @@
       if (b) b.disabled = picked.includes(d);
     }
   }
-
 function buildPad() {
   if (!pad) return;
 
   pad.innerHTML = "";
   buttons.clear();
 
-  const layout = [1,2,3,4,5,6,7,8,9,"empty",0,"empty"];
+  const layout = [
+    1,2,3,
+    4,5,6,
+    7,8,9,
+    "back",0,"clear"
+  ];
 
   layout.forEach((item) => {
-    if (item === "empty") {
-      const spacer = document.createElement("div");
-      spacer.style.width = "56px";
-      spacer.style.height = "56px";
-      pad.appendChild(spacer);
+
+    // ← 버튼
+    if (item === "back") {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "num-btn";
+      b.textContent = "←";
+      b.addEventListener("click", () => {
+        if (done) return;
+        if (picked.length === 0) return;
+        picked.pop();
+        renderPicked();
+      });
+      pad.appendChild(b);
       return;
     }
 
+    // CLR 버튼
+    if (item === "clear") {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "num-btn";
+      b.textContent = "CLR";
+      b.addEventListener("click", () => {
+        if (done) return;
+        picked.length = 0;
+        renderPicked();
+      });
+      pad.appendChild(b);
+      return;
+    }
+
+    // 숫자 버튼
     const b = document.createElement("button");
     b.type = "button";
     b.className = "num-btn";
@@ -89,7 +118,6 @@ function buildPad() {
 
   renderPicked();
 }
-
 
   function resetGame() {
     answer = makeAnswer();
