@@ -89,7 +89,17 @@ def file_batch():
     return render_template("file_batch.html")
 
 
+@app.route("/baseball-game", methods=["GET"])
+def baseball_game():
+    return render_template("baseball_game.html")
 
+@app.route("/capital-quiz", methods=["GET"])
+def capital_quiz():
+    return render_template("capital_quiz.html")
+
+@app.route("/memory-capital")
+def memory_capital():
+    return render_template("memory_capital.html")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

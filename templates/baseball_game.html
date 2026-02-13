@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>야구게임</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+<style>
+  /* =========================
+     야구게임 전용 레이아웃
+  ========================== */
+
+  .wrap{
+    max-width: 600px;
+  }
+
+  .panel{
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .panel .field{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  #guessInput{
+    width: 100%;
+  }
+
+  #hintText{
+    text-align: center;
+  }
+
+  .panel .actions{
+    justify-content: center;
+  }
+
+  #historyTable{
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #historyTable th,
+  #historyTable td{
+    text-align: center;
+  }
+
+  /* =========================
+     결과 뱃지 스타일
+  ========================== */
+
+  .result-badges{
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width: 42px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* Strike */
+  .badge.s{
+    background: linear-gradient(180deg, rgba(255,80,80,0.85), rgba(180,0,0,0.8));
+    color:#fff;
+  }
+
+  /* Ball */
+  .badge.b{
+    background: linear-gradient(180deg, rgba(80,160,255,0.85), rgba(0,80,200,0.8));
+    color:#fff;
+  }
+
+  /* Out */
+  .badge.o{
+    background: linear-gradient(180deg, rgba(120,120,120,0.85), rgba(60,60,60,0.8));
+    color:#fff;
+  }
+
+  /* 0일 때 무채색 */
+  .badge.zero{
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.45);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  /* 확인 버튼 강조 */
+  #submitBtn{
+    box-shadow: 0 6px 18px rgba(255,80,80,0.4);
+  }
+
+
+.panel .actions .btn{
+  width: 40%;     /* 원하는 고정 너비 */
+}
+
+</style>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a class="brand" href="/">
+        <div class="logo"></div>
+        <div class="brand-title">
+          <b>UTIL WEB</b>
+          <span>Mini games</span>
+        </div>
+      </a>
+      <div class="nav">
+        <a class="btn small" href="/">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="top">
+      <h1>야구게임</h1>
+      <p class="sub">3자리 숫자를 맞추는 숫자 야구입니다. (중복 없음)</p>
+    </section>
+
+
+<section class="panel">
+      <h2>기록</h2>
+      <table class="table" id="historyTable">
+        <thead>
+          <tr>
+            <th style="width:90px;">회차</th>
+            <th style="width:120px;">입력</th>
+            <th>결과</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody">
+          <tr>
+            <td colspan="3" class="td-content" style="color: rgba(255,255,255,0.62);">
+              아직 기록이 없습니다.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+
+    <section class="panel">
+      <h2>게임</h2>
+
+      <div class="form">
+        <div class="field">
+          <label>입력 (예: 123)</label>
+          <input id="guessInput" maxlength="3" placeholder="서로 다른 숫자 3개" />
+          <div class="hint" id="hintText">규칙: 0부터 9까지, 서로 다른 숫자 3개</div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="submitBtn">확인</button>
+          <button class="btn" id="newGameBtn">새 게임</button>
+        </div>
+      </div>
+
+      <div class="hint" id="statusText">시도 0회</div>
+    </section>
+
+    
+      <div class="foot" id="answerFoot" style="display:none;">
+        정답: <b id="answerText"></b>
+      </div>
+    </section>
+  </div>
+
+  <script src="/static/js/baseball_game.js"></script>
+</body>
+</html>

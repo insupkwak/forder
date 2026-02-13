@@ -1,0 +1,312 @@
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>국기 카드 기억 게임</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    
+ /* =========================
+   MEMORY GAME LAYOUT
+========================= */
+
+/* ✅ 페이지 폭/가운데 정렬 */
+.memory-wrap{
+  max-width: 800px;
+}
+
+/* ✅ 설정/게임 패널 모두 같은 폭 + 가운데 */
+.memory-panel,
+.memory-kpi{
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ✅ 시작 버튼 가운데 + 넓게 */
+.memory-actions{
+  justify-content: center;
+  gap: 12px;
+}
+
+.big-start{
+  width: 320px;
+  max-width: 100%;
+  padding: 14px 18px;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+/* ✅ 드롭다운: 배경 어둡게 + 글자 흰색 */
+.select-dark{
+  width: 260px;
+  max-width: 100%;
+  padding: 11px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.35);
+  color: rgba(255,255,255,0.92);
+  outline: none;
+}
+
+/* 옵션은 OS UI 영향 받음. 안 보일 때 대비 */
+.select-dark option{
+  color: #111;
+}
+
+/* =========================
+   BOARD GRID
+========================= */
+.board{
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+@media (max-width: 700px){
+  .board{ grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+
+/* =========================
+   CARD FLIP
+========================= */
+
+/* 카드 컨테이너 (perspective는 바깥에) */
+.card-tile{
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
+
+  perspective: 900px; /* ✅ 3D 효과 */
+}
+
+.card-tile:active{
+  transform: scale(0.99);
+}
+
+/* 안쪽 래퍼를 회전시키는 방식 */
+.card-inner{
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.18s ease;
+}
+
+/* 앞/뒤 면 */
+.card-face{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.front{
+  background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+}
+
+.front .mark{
+  width: 54%;
+  height: 54%;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background:
+    radial-gradient(18px 18px at 30% 30%, rgba(255,255,255,0.85), rgba(255,255,255,0.0)),
+    linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02));
+  opacity: 0.9;
+}
+
+.back{
+  transform: rotateY(180deg);
+  background: rgba(0,0,0,0.22);
+  padding: 10px;
+}
+
+/* flip 상태 */
+.card-tile.is-flipped .card-inner{
+  transform: rotateY(180deg);
+}
+
+/* 매칭 상태 */
+.card-tile.is-matched{
+  cursor: default;
+  opacity: 0.78;
+  border-color: rgba(80,255,160,0.22);
+}
+
+/* 국기 이미지 */
+.flag{
+  width: 70%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+
+/* KPI 값 폰트 */
+.kpi .chip .v{
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* ✅ 설정 패널 전체를 가운데 정렬 */
+.memory-panel{
+  text-align: center;
+}
+
+/* ✅ 설정 영역(라벨+셀렉트+힌트)을 가운데로 */
+.memory-panel .field{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ✅ select 폭을 깔끔하게, 가운데 */
+.select-dark{
+  width: 260px;
+  max-width: 100%;
+  text-align: center;     /* select 텍스트 가운데 */
+  text-align-last: center;/* 크롬/엣지에서 선택값 가운데 */
+}
+
+/* ✅ 버튼 영역도 가운데 */
+.memory-actions{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ✅ 게임 시작 버튼 텍스트를 '완전' 가운데로 */
+.big-start{
+  display: inline-flex;       /* 핵심 */
+  align-items: center;        /* 세로 가운데 */
+  justify-content: center;    /* 가로 가운데 */
+  text-align: center;
+}
+
+
+/* 설정 영역 폭을 하나로 고정 */
+.memory-panel .field,
+.memory-actions {
+  width: 360px;         /* 👈 기준 폭 */
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.select-dark {
+  width: 100%;          /* 부모 폭에 맞춤 */
+  text-align: center;
+  text-align-last: center;
+}
+
+.big-start {
+  width: 100%;          /* 👈 360px에 맞춰짐 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.memory-actions .btn {
+  flex: 1;      /* 두 버튼 동일 비율 */
+}
+
+/* 모든 버튼 내부 텍스트 완전 가운데 */
+.memory-actions .btn{
+  display: inline-flex;
+  align-items: center;     /* 세로 가운데 */
+  justify-content: center; /* 가로 가운데 */
+  text-align: center;
+}
+
+
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a class="brand" href="/" style="text-decoration:none;">
+        <div class="logo"></div>
+        <div class="brand-title">
+          <b>유틸 웹</b>
+          <span>국기 카드 기억 게임</span>
+        </div>
+      </a>
+      <div class="nav">
+        <a class="btn small" href="/">home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap memory-wrap">
+  <section class="top">
+    <h1>국기 카드 기억 게임</h1>
+    <p class="sub">같은 국기 2장을 찾아 모두 맞추면 완료됩니다.</p>
+
+    <div class="kpi memory-kpi">
+      <div class="chip">
+        <div class="t">Time</div>
+        <div class="v" id="kpiTime">00:00</div>
+      </div>
+      <div class="chip">
+        <div class="t">Moves</div>
+        <div class="v" id="kpiMoves">0</div>
+      </div>
+      <div class="chip">
+        <div class="t">Matched</div>
+        <div class="v" id="kpiMatched">0 / 0</div>
+      </div>
+    </div>
+
+    <!-- ✅ 설정 패널 (가운데/폭 동일) -->
+    <div class="panel memory-panel">
+      <h2>게임 설정</h2>
+
+      <div class="field" style="margin-top:10px;">
+        <label for="difficultySelect">난이도</label>
+        <select id="difficultySelect" class="select-dark">
+          <option value="4">4 x 4</option>
+    
+          <option value="6">6 x 6</option>
+
+          <option value="8">8 x 8</option>
+
+          <option value="10" selected>10 x 10</option>
+        </select>
+    
+      </div>
+
+      <div class="actions memory-actions">
+        <button class="btn primary big-start" id="startBtn">게임 시작</button>
+        <button class="btn" id="restartBtn">다시 섞기</button>
+      </div>
+
+      <div class="hint" id="statusText" style="text-align:center; margin-top:8px;">설정 후 게임 시작을 누르세요.</div>
+    </div>
+
+    <!-- ✅ 게임 패널 (가운데/폭 1000) -->
+    <div class="panel memory-panel">
+      <h2>게임</h2>
+      <div class="board" id="board"></div>
+      <div class="foot" id="doneText" style="display:none; text-align:center; margin-top:14px;"></div>
+    </div>
+  </section>
+</div>
+
+
+
+  <script src="/static/js/memory_capital.js"></script>
+</body>
+</html>

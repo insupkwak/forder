@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>수도 맞추기 퀴즈</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+<style>
+  /* 페이지 전체 폭을 조금 줄여서 집중도 올림 */
+  .wrap{
+    max-width: 980px;
+  }
+
+  /* KPI 글자 더 크고 대비 높이기 */
+  .kpi .chip .t{
+    font-size: 13px;
+    color: rgba(255,255,255,0.70);
+  }
+  .kpi .chip .v{
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+  }
+
+  /* 문제 카드 안쪽을 더 "퀴즈판"처럼 */
+  .quiz-card{
+    max-width: 820px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 18px 18px;
+  }
+
+  /* 나라 타이틀 강조 */
+  #qTitle{
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+  }
+
+  /* 국기 크게 + 중앙 */
+  #qFlag{
+    font-size: 46px;
+    line-height: 1;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    filter: drop-shadow(0 10px 24px rgba(0,0,0,0.35));
+  }
+
+  /* 힌트(안내) 글자 */
+  #qHint{
+    font-size: 14px;
+    color: rgba(255,255,255,0.72);
+  }
+
+  /* 보기 버튼: 크기/간격/정렬 개선 */
+  #choices{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  /* 보기 버튼을 더 크게 */
+  #choices .btn{
+    width: 100%;
+    justify-content: center;
+    padding: 14px 14px;
+    font-size: 15px;
+    font-weight: 800;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.07);
+    border-color: rgba(255,255,255,0.18);
+  }
+
+  #choices .btn:hover{
+    background: rgba(255,255,255,0.10);
+    border-color: rgba(255,255,255,0.26);
+  }
+
+  /* 다음/초기화 버튼도 보기 좋게 */
+  .quiz-actions{
+    justify-content: center;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .quiz-actions .btn{
+    min-width: 130px;
+    padding: 12px 16px;
+    font-weight: 800;
+  }
+
+  /* 결과 메시지(정답/오답) 시인성 강화 */
+  #resultText{
+    margin-top: 12px;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    text-align: center;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(255,255,255,0.05);
+  }
+
+  /* 정답/오답 스타일(선택: JS가 클래스 넣어줄 때 적용) */
+  #resultText.ok{
+    border-color: rgba(80,255,160,0.25);
+    background: rgba(80,255,160,0.08);
+  }
+  #resultText.no{
+    border-color: rgba(255,80,80,0.22);
+    background: rgba(255,80,80,0.07);
+  }
+
+  /* 모바일에서는 보기 1열 */
+  @media (max-width: 640px){
+    .wrap{ max-width: 560px; }
+    #choices{ grid-template-columns: 1fr; }
+  }
+#resultText.ok{
+  border-color: rgba(80,255,160,0.25);
+  background: rgba(80,255,160,0.08);
+}
+
+#resultText.no{
+  border-color: rgba(255,80,80,0.22);
+  background: rgba(255,80,80,0.07);
+}
+
+.wrap{
+  max-width: 600px;
+}
+
+.panel{
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 보기 버튼 아래 충분한 간격 */
+#choices{
+  margin-bottom: 24px;
+}
+
+/* 다음 / 초기화 버튼 영역 */
+.quiz-actions{
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 28px;   /* 위와 간격 */
+  margin-bottom: 10px;
+}
+
+.quiz-card{
+  display: flex;
+  flex-direction: column;
+}
+
+.quiz-actions{
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.flag-img{
+  width: 80px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.flag-img{
+  width: 80px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+
+</style>
+
+
+</head>
+
+
+
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a class="brand" href="/">
+        <div class="logo"></div>
+        <div class="brand-title">
+          <b>UTIL WEB</b>
+          <span>Capital quiz</span>
+        </div>
+      </a>
+      <div class="nav">
+        <a class="btn small" href="/">Home</a>
+
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="top">
+      <h1>수도 맞추기 퀴즈</h1>
+      <p class="sub">객관식으로 수도를 맞춥니다. 국기는 이모지로 표시합니다.</p>
+    </section>
+
+    <section class="panel">
+      <h2>문제</h2>
+
+      <div class="kpi">
+        <div class="chip">
+          <div class="t">Score</div>
+          <div class="v" id="kpiScore">0</div>
+        </div>
+        <div class="chip">
+          <div class="t">Correct</div>
+          <div class="v" id="kpiCorrect">0</div>
+        </div>
+        <div class="chip">
+          <div class="t">Wrong</div>
+          <div class="v" id="kpiWrong">0</div>
+        </div>
+      </div>
+
+      <div class="panel quiz-card" style="margin-top:14px;">
+
+        <h2 id="qTitle" style="margin-bottom:6px;">나라</h2>
+        <div class="hint" id="qFlag" style="font-size: 28px; margin-top: 6px;">🏳️</div>
+        <div class="hint" id="qHint">아래 보기 중 수도를 고르세요.</div>
+
+        <div class="actions" id="choices" style="margin-top: 12px;"></div>
+
+<div class="actions">
+  <button class="btn" id="nextBtn">다음 문제</button>
+  <button class="btn" id="resetBtn">초기화</button>
+</div>
+
+
+        <div class="foot" id="resultText"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="/static/js/capital_quiz.js"></script>
+</body>
+</html>

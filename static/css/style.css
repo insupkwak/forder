@@ -355,3 +355,23 @@ textarea{ resize: vertical; }
   .grid{ grid-template-columns: 1fr; }
   .kpi{ grid-template-columns: 1fr; }
 }
+
+
+/* 🔥 시작 버튼 강조 */
+.big-start{
+  width: 100%;
+  max-width: 360px;
+  font-size: 16px;
+  padding: 14px 0;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+
+  background: linear-gradient(180deg, rgba(80,255,160,0.9), rgba(0,180,90,0.8));
+  border: 1px solid rgba(80,255,160,0.6);
+  box-shadow: 0 8px 28px rgba(80,255,160,0.45);
+}
+
+.big-start:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(80,255,160,0.6);
+}
