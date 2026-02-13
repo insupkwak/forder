@@ -107,6 +107,52 @@
   width: 40%;     /* 원하는 고정 너비 */
 }
 
+
+/* ===== 버튼 입력 UI ===== */
+.guess-picked{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin: 12px 0 14px;
+}
+.guess-picked .slot{
+  width:56px; height:56px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:14px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+  font-size: 22px;
+  user-select:none;
+}
+
+.guess-pad{
+  display:grid;
+  grid-template-columns: repeat(3, 56px);
+  justify-content:center;
+  gap:10px;
+  margin-bottom: 6px;
+}
+
+.num-btn{
+  width:56px; height:56px;
+  border-radius:14px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+  cursor:pointer;
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.92);
+}
+.num-btn:active{ transform: scale(0.99); }
+.num-btn:disabled{
+  opacity:0.35;
+  cursor:not-allowed;
+}
+/* ======================= */
+
+
 </style>
 
 
@@ -160,9 +206,20 @@
 
       <div class="form">
         <div class="field">
-          <label>입력 (예: 123)</label>
-          <input id="guessInput" maxlength="3" placeholder="서로 다른 숫자 3개" />
-          <div class="hint" id="hintText">규칙: 0부터 9까지, 서로 다른 숫자 3개</div>
+<label>입력 (버튼으로 3자리 선택)</label>
+
+<!-- 선택된 3자리 표시 -->
+<div class="guess-picked" id="pickRow">
+  <div class="slot">_</div>
+  <div class="slot">_</div>
+  <div class="slot">_</div>
+</div>
+
+<!-- 숫자 버튼 패드 -->
+<div class="guess-pad" id="pad"></div>
+
+<div class="hint" id="hintText">규칙: 0부터 9까지, 서로 다른 숫자 3개</div>
+
         </div>
 
         <div class="actions">
