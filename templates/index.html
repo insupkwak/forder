@@ -9,38 +9,54 @@
 
 <body>
   <div class="wrap">
-    <header class="top">
-      <h1>유틸 웹</h1>
-      <p class="sub">필요한 작업을 선택하세요.</p>
-    </header>
+<header class="top">
+  <div class="top-bar">
+    <h1>유틸 웹</h1>
+    <div class="visit-mini">
+      Total {{ kpis.total_visits }} |
+      Today {{ kpis.today_visits }}
+    </div>
+  </div>
+  <p class="sub">필요한 작업을 선택하세요.</p>
+</header>
+
+
+
+      <!-- /방문자 KPI 추가 -->
 
     <div class="grid">
       <a class="card" href="/folder-builder">
         <h2>폴더 만들기</h2>
-        <p>폴더 트리를 입력하면 ZIP으로 다운로드됩니다.</p>
+        <p>등록한 이름으로 폴더 트리를 만들어줍니다.</p>
       </a>
 
       <a class="card" href="/file-batch">
         <h2>파일 여러개 만들기</h2>
-        <p>파일 업로드 후 파일명 목록을 입력하면 ZIP으로 생성됩니다.</p>
+        <p>같은 파일을 다른이름으로 여러개 복사합니다.</p>
       </a>
 
       <!-- 추가 메뉴 1: 야구게임 -->
       <a class="card" href="/baseball-game">
         <h2>야구게임</h2>
-        <p>숫자 야구 또는 간단한 야구 미니게임을 즐겨보세요.</p>
+        <p>숫자 야구 미니게임을 즐겨보세요.</p>
       </a>
 
       <!-- 추가 메뉴 2: 수도 맞추기 퀴즈 -->
       <a class="card" href="/capital-quiz">
         <h2>수도 맞추기 퀴즈</h2>
-        <p>객관식으로 나라 수도를 맞추고, 국기도 함께 확인합니다.</p>
+        <p>나라 수도를 맞추세요.</p>
       </a>
 
 <a class="card" href="/memory-capital">
   <h2>국기 카드 기억 게임</h2>
   <p>같은 국기 카드 2장을 맞추세요.</p>
 </a>
+
+<a class="card" href="/reaction-game">
+  <h2>순발력 테스트</h2>
+  <p>색이 바뀌는 순간 클릭하세요. 반응속도를 측정합니다.</p>
+</a>
+
 
       
     </div>
