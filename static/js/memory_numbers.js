@@ -3,6 +3,7 @@
 
   const diffSelect = $("diffSelect");
   const startBtn = $("startBtn");
+  const restartBtn = $("restartBtn"); // 재시작 버튼 쓰는 경우
   const homeBtn = $("homeBtn");
 
   const stateMini = $("stateMini");
@@ -16,11 +17,9 @@
   const statusLeft = $("statusLeft");
   const statusRight = $("statusRight");
   const history = $("history");
-  const restartBtn = $("restartBtn");
-
 
   const SHOW_MS = 5000;
-  const KEY_PREFIX = "memory_numbers_best10_"; // difficulty별
+  const KEY_PREFIX = "memory_numbers_rank_"; // 난이도별 저장
 
   let n = 4;
   let total = 16;
@@ -34,12 +33,6 @@
   let revealTimer = 0;
 
   let scores = [];
-
-function fmt1(ms) {
-  return (ms / 1000).toFixed(1);
-}
-
-
 
   function setState(s) {
     stateMini.textContent = "상태: " + s;
@@ -58,8 +51,12 @@ function fmt1(ms) {
     localStorage.setItem(key(), JSON.stringify(arr));
   }
 
-  function fmt(ms) {
+  function fmt3(ms) {
     return (ms / 1000).toFixed(3);
+  }
+
+  function fmt1(ms) {
+    return (ms / 1000).toFixed(1);
   }
 
   function shuffle(arr) {
@@ -70,7 +67,6 @@ function fmt1(ms) {
     return arr;
   }
 
-  
   function parseDiff() {
     n = parseInt(diffSelect.value, 10);
     total = n * n;
@@ -82,18 +78,15 @@ function fmt1(ms) {
     kpiHit.textContent = String(hit);
   }
 
+  // 베스트는 "단계 우선 + 시간" 기준으로 1등을 요약 표시
   function renderBest() {
-    const best = scores.length ? scores[0] : null;
-    if (!best) {
+    if (!scores.length) {
       kpiBest.textContent = "-";
       return;
     }
-    if (best.completed) {
-      kpiBest.textContent = `${fmt1(best.time_ms)} s`;
-
-    } else {
-      kpiBest.textContent = `${best.hit}/${total} (미완주)`;
-    }
+    const best = scores[0];
+    // KPI는 간단히: 단계/시간(소수1자리)
+    kpiBest.textContent = `${best.hit}/${total} · ${fmt1(best.time_ms)}s`;
   }
 
   function renderHistory() {
@@ -107,13 +100,9 @@ function fmt1(ms) {
     }
 
     scores.forEach((s, i) => {
-      const label = s.completed
-        ? `완주 · ${fmt(s.time_ms)} s`
-        : `미완주 · ${s.hit}/${total} · ${fmt(s.time_ms)} s`;
-
       const div = document.createElement("div");
       div.className = "row";
-      div.innerHTML = `<div class="l">TOP ${i + 1} · ${s.at}</div><div class="r">${label}</div>`;
+      div.innerHTML = `<div class="l">TOP ${i + 1} · ${s.at}</div><div class="r">${s.hit}/${total} · ${fmt3(s.time_ms)} s</div>`;
       history.appendChild(div);
     });
   }
@@ -143,7 +132,8 @@ function fmt1(ms) {
   function tick() {
     if (phase !== "play") return;
     const ms = Math.max(0, Math.round(performance.now() - startAt));
-    kpiTime.textContent = fmt(ms); // "0.000"만 표시
+    // 표시만 깔끔하게(초 단위 숫자만 원하면 fmt3(ms)만 넣어도 됨)
+    kpiTime.textContent = fmt3(ms);
     raf = requestAnimationFrame(tick);
   }
 
@@ -154,7 +144,9 @@ function fmt1(ms) {
     phase = "show";
     nextNum = 1;
     hit = 0;
-    kpiTime.textContent = "0.000 s";
+
+    kpiTime.textContent = "0.000";
+    renderKpis();
 
     diffSelect.disabled = true;
     startBtn.disabled = true;
@@ -163,16 +155,15 @@ function fmt1(ms) {
     statusLeft.textContent = "5초 동안 숫자를 외우세요!";
     buildGrid();
     setHidden(false);
-    renderKpis();
+
     renderBest();
     renderHistory();
 
-    // 5초 후 숨기고 플레이 시작
     clearTimeout(revealTimer);
     revealTimer = setTimeout(() => {
       phase = "play";
       setState("플레이");
-      statusLeft.textContent = "사라졌습니다. 1부터 순서대로 누르세요!";
+      statusLeft.textContent = "사라졌습니다. 1부터 순서대로 누르세요! (틀리면 즉시 종료)";
       setHidden(true);
 
       startAt = performance.now();
@@ -180,49 +171,46 @@ function fmt1(ms) {
     }, SHOW_MS);
   }
 
-  function finish(completed) {
+  // ✅ 기록 저장: 단계(hit) + 시간(time_ms)
+  // ✅ 순위 정렬: 단계 desc, 시간 asc
+  function finish(reasonText) {
+    if (phase !== "play") return;
+
     phase = "done";
     cancelAnimationFrame(raf);
     clearTimeout(revealTimer);
 
     const time_ms = Math.max(0, Math.round(performance.now() - startAt));
+
     setState("완료");
+    setHidden(false); // 끝나면 답 다시 보여주기
 
-    const at = new Date().toLocaleString();
-    const record = { completed, hit, time_ms, at };
-
-    // 저장/정렬 규칙:
-    // 1) 완주가 우선
-    // 2) 완주끼리는 time_ms 오름차순
-    // 3) 미완주끼리는 hit 내림차순, 동률이면 time_ms 오름차순
-    scores.push(record);
-    scores.sort((a, b) => {
-      if (a.completed !== b.completed) return a.completed ? -1 : 1;
-
-      if (a.completed && b.completed) return a.time_ms - b.time_ms;
-
-      if (a.hit !== b.hit) return b.hit - a.hit;
-      return a.time_ms - b.time_ms;
-    });
-
-    scores = scores.slice(0, 10);
-    saveScores(scores);
-
-    setHidden(false); // 결과 확인용으로 다시 보여주기
     diffSelect.disabled = false;
     startBtn.disabled = false;
     startBtn.textContent = "다시 시작";
 
-    if (completed) {
-      statusLeft.textContent = `완주! 기록: ${fmt(time_ms)} s`;
+    const at = new Date().toLocaleString();
+    const record = { hit, time_ms, at };
+
+    scores.push(record);
+    scores.sort((a, b) => {
+      if (a.hit !== b.hit) return b.hit - a.hit;     // 단계 높은 순
+      return a.time_ms - b.time_ms;                  // 시간 짧은 순
+    });
+    scores = scores.slice(0, 10);
+    saveScores(scores);
+
+    if (hit >= total) {
+      statusLeft.textContent = `완료! ${hit}/${total} · 시간 ${fmt3(time_ms)} s`;
     } else {
-      statusLeft.textContent = `종료! 성공: ${hit}/${total}, 시간: ${fmt(time_ms)} s`;
+      statusLeft.textContent = `${reasonText}  ${hit}/${total} · 시간 ${fmt3(time_ms)} s`;
     }
 
     renderBest();
     renderHistory();
   }
 
+  // ✅ 틀리면 바로 끝
   function onCellClick(e) {
     if (phase !== "play") return;
 
@@ -237,56 +225,60 @@ function fmt1(ms) {
 
       hit += 1;
       nextNum += 1;
-
       renderKpis();
 
       if (nextNum > total) {
-        finish(true);
+        // 다 맞춘 경우도 기록 저장(단계=total)
+        finish("완주!");
       }
       return;
     }
 
-    // 오답 피드백만 (패널티 없음 - 원하면 넣어줄게)
+    // 오답이면 즉시 종료
     cell.classList.add("bad");
     setTimeout(() => cell.classList.remove("bad"), 160);
+
+    finish("오답! 게임 종료.");
   }
 
+  function restart() {
+    cancelAnimationFrame(raf);
+    clearTimeout(revealTimer);
 
-function restart() {
-  // 진행 중이면 중단
-  cancelAnimationFrame(raf);
-  clearTimeout(revealTimer);
+    phase = "idle";
+    diffSelect.disabled = false;
+    startBtn.disabled = false;
+    startBtn.textContent = "시작";
 
-  phase = "idle";
-  diffSelect.disabled = false;
-  startBtn.disabled = false;
-  startBtn.textContent = "시작";
+    nextNum = 1;
+    hit = 0;
+    kpiTime.textContent = "0.000";
 
-  nextNum = 1;
-  hit = 0;
-  kpiTime.textContent = "0.000";
-  statusLeft.textContent = "재시작 준비 완료. 시작을 누르세요.";
-  setState("준비");
+    setState("준비");
+    statusLeft.textContent = "재시작 준비 완료. 시작을 누르세요.";
+    buildGrid();
+    setHidden(false);
 
-  buildGrid();
-  setHidden(false);
-  renderKpis();
-}
-
-
+    renderKpis();
+  }
 
   diffSelect.addEventListener("change", () => {
     if (phase === "show" || phase === "play") return;
+
     parseDiff();
     scores = loadScores();
+
     setState("준비");
     statusLeft.textContent = "시작을 누르면 5초 동안 숫자가 표시됩니다.";
     startBtn.textContent = "시작";
-    buildGrid();
-    setHidden(false);
+
     nextNum = 1;
     hit = 0;
-    kpiTime.textContent = "0.000 s";
+    kpiTime.textContent = "0.000";
+
+    buildGrid();
+    setHidden(false);
+
     renderKpis();
     renderBest();
     renderHistory();
@@ -297,17 +289,26 @@ function restart() {
     start();
   });
 
-  homeBtn.addEventListener("click", () => (window.location.href = "/"));
-  restartBtn.addEventListener("click", restart);
+  if (restartBtn) restartBtn.addEventListener("click", restart);
 
+  homeBtn.addEventListener("click", () => (window.location.href = "/"));
 
   // init
   (function init() {
     parseDiff();
     scores = loadScores();
+
     setState("준비");
+    statusLeft.textContent = "시작을 누르면 5초 동안 숫자가 표시됩니다.";
+    startBtn.textContent = "시작";
+
+    nextNum = 1;
+    hit = 0;
+    kpiTime.textContent = "0.000";
+
     buildGrid();
     setHidden(false);
+
     renderKpis();
     renderBest();
     renderHistory();
