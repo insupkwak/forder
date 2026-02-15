@@ -198,5 +198,10 @@ def number_order():
     return render_template("number_order.html")
 
 
+@app.route("/memory-numbers")
+def memory_numbers():
+    return render_template("memory_numbers.html")
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
