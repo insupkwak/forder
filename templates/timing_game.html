@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>타이밍 챌린지</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .wrap{ max-width: 900px; }
+    .panel{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+      padding: 16px;
+    }
+    .head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+    .head h1{ margin:0; font-size: 22px; }
+    .mini{ opacity:0.7; font-size: 12px; }
+
+    .controls{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+    }
+    .controls-left{ display:flex; gap: 10px; align-items:center; flex-wrap:wrap; }
+    .btn{
+      height: 44px;
+      padding: 0 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: inherit;
+      font-weight: 900;
+      font-size: 14px;
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+    }
+    .btn.primary{
+      min-width: 170px;
+      font-size: 16px;
+      background: linear-gradient(135deg, rgba(46,204,113,0.35), rgba(46,204,113,0.18));
+      border-color: rgba(46,204,113,0.6);
+      box-shadow: 0 6px 18px rgba(46,204,113,0.25);
+    }
+    .btn.ghost{ background: rgba(255,255,255,0.04); }
+    .btn:active{ transform: scale(0.99); }
+    .btn[disabled]{ opacity:0.5; cursor:not-allowed; }
+
+    .stage{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 18px;
+      text-align:center;
+    }
+    .timer{
+      font-size: 56px;
+      font-weight: 1000;
+      letter-spacing: 1px;
+      margin: 10px 0 6px;
+    }
+    .target{
+      opacity: 0.75;
+      font-size: 13px;
+    }
+
+    .kpis{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .kpi{
+      min-width:0;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 10px 12px;
+      text-align:left;
+    }
+    .kpi .t{ font-size: 12px; opacity: 0.85; }
+    .kpi .v{ font-size: 20px; font-weight: 1000; margin-top: 4px; }
+
+    .history{
+      margin-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      padding-top: 12px;
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.12);
+      font-size: 13px;
+    }
+    .row .l{ opacity:0.75; }
+    .row .r{ font-weight:900; }
+
+    @media (max-width: 700px){
+      .kpis{ grid-template-columns: 1fr; }
+      .timer{ font-size: 44px; }
+      .controls{ flex-direction: column; align-items: stretch; }
+      .controls-left{ justify-content:space-between; }
+      .btn{ width: 100%; }
+    }
+
+
+.select{
+  min-width: 160px;
+  height: 44px;
+  padding: 0 44px 0 14px; /* 오른쪽 화살표 공간 */
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  font-weight: 900;
+  font-size: 14px;
+  outline: none;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.85) 50%),
+    linear-gradient(135deg, rgba(255,255,255,0.85) 50%, transparent 50%),
+    linear-gradient(to right, rgba(255,255,255,0.10), rgba(255,255,255,0.10));
+  background-position:
+    calc(100% - 20px) 50%,
+    calc(100% - 14px) 50%,
+    calc(100% - 40px) 50%;
+  background-size:
+    6px 6px,
+    6px 6px,
+    1px 22px;
+  background-repeat: no-repeat;
+}
+
+/* 윈도우 드롭다운 목록 가독성 */
+.select option{
+  background: #ffffff;
+  color: #000000;
+}
+.controls-left{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <div class="head">
+        <div>
+          <h1>타이밍 챌린지</h1>
+          <div class="mini">시작 후 타이머를 멈춰서 설정한 시간에 맞추세요.</div>
+        </div>
+        <div class="mini" id="stateMini">상태: 준비</div>
+      </div>
+
+      <div class="controls">
+        <div class="controls-left">
+<div class="controls-left">
+
+  <select class="select" id="targetSelect">
+    <option value="2000">2초</option>
+    <option value="4000">4초</option>
+    <option value="6000">6초</option>
+    <option value="8000">8초</option>
+    <option value="10000" selected>10초</option>
+  </select>
+
+  <button class="btn primary" id="mainBtn">시작</button>
+
+</div>
+
+          
+        </div>
+        <button class="btn ghost" id="homeBtn">홈으로</button>
+      </div>
+
+      <div class="stage">
+        <div class="target">목표: <b id="targetLabel">10.00초</b></div>
+
+        <div class="timer" id="timerText">0.00</div>
+        <div class="mini" id="resultText">시작 버튼을 누르세요.</div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="t">이번 기록</div>
+          <div class="v" id="kpiThis">-</div>
+        </div>
+        <div class="kpi">
+          <div class="t">오차</div>
+          <div class="v" id="kpiDiff">-</div>
+        </div>
+        <div class="kpi">
+          <div class="t">베스트 오차</div>
+          <div class="v" id="kpiBest">-</div>
+        </div>
+      </div>
+
+      <div class="history" id="history"></div>
+    </div>
+  </div>
+
+  <script src="/static/js/timing_game.js"></script>
+</body>
+</html>

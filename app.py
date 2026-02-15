@@ -189,6 +189,9 @@ def reaction_game():
     return render_template("reaction_game.html")
 
 
+@app.route("/timing-game")
+def timing_game():
+    return render_template("timing_game.html")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
