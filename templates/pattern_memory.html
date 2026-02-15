@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>패턴 기억 게임</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .wrap{ max-width: 980px; }
+    .panel{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+      padding: 16px;
+    }
+    .head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+    .head h1{ margin:0; font-size: 22px; }
+    .mini{ opacity:0.7; font-size: 12px; }
+
+    .controls{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+    }
+    .controls-left{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; }
+    .controls-right{ display:flex; align-items:center; gap: 10px; }
+
+    .select{
+      min-width: 170px;
+      height: 44px;
+      padding: 0 44px 0 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-weight: 900;
+      font-size: 14px;
+      outline: none;
+
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.85) 50%),
+        linear-gradient(135deg, rgba(255,255,255,0.85) 50%, transparent 50%),
+        linear-gradient(to right, rgba(255,255,255,0.10), rgba(255,255,255,0.10));
+      background-position:
+        calc(100% - 20px) 50%,
+        calc(100% - 14px) 50%,
+        calc(100% - 40px) 50%;
+      background-size:
+        6px 6px,
+        6px 6px,
+        1px 22px;
+      background-repeat: no-repeat;
+    }
+    .select option{ background:#fff; color:#000; }
+
+    .btn{
+      height: 44px;
+      padding: 0 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: inherit;
+      font-weight: 900;
+      font-size: 14px;
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+      white-space: nowrap;
+    }
+    .btn.primary{
+      min-width: 190px;
+      font-size: 16px;
+      background: linear-gradient(135deg, rgba(46,204,113,0.35), rgba(46,204,113,0.18));
+      border-color: rgba(46,204,113,0.6);
+      box-shadow: 0 6px 18px rgba(46,204,113,0.25);
+    }
+    .btn.ghost{ background: rgba(255,255,255,0.04); }
+    .btn:active{ transform: scale(0.99); }
+    .btn[disabled]{ opacity:0.5; cursor:not-allowed; }
+
+    .kpis{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .kpi{
+      min-width:0;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 10px 12px;
+    }
+    .kpi .t{ font-size: 11px; opacity: 0.75; }
+    .kpi .v{
+      font-size: 16px;
+      font-weight: 800;
+      margin-top: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .arena{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 14px;
+    }
+
+    .board{
+      position: relative;
+      width: min(540px, 90vw);
+      margin: 0 auto;
+      aspect-ratio: 1 / 1;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.10);
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+    }
+
+    /* SVG 선 */
+    .board svg{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      pointer-events:none;
+    }
+
+    .dots{
+      position:absolute;
+      inset:0;
+      display:grid;
+      gap: 18px;
+      padding: 22px;
+    }
+
+    .dot{
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.28);
+      position: relative;
+    }
+
+    .dot::after{
+      content:"";
+      width: 34%;
+      height: 34%;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.16);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .dot.active{
+      background: rgba(46,204,113,0.14);
+      border-color: rgba(46,204,113,0.45);
+    }
+
+    .dot.bad{
+      background: rgba(231,76,60,0.14);
+      border-color: rgba(231,76,60,0.45);
+    }
+
+    .status{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    .history{
+      margin-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      padding-top: 12px;
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.12);
+      font-size: 13px;
+    }
+    .row .l{ opacity:0.75; }
+    .row .r{ font-weight:900; }
+
+    @media (max-width: 900px){
+      .kpis{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .btn.primary{ width: 100%; }
+    }
+    @media (max-width: 640px){
+      .controls{ flex-direction: column; align-items: stretch; }
+      .controls-left, .controls-right{ justify-content: space-between; }
+      .select{ width: 100%; }
+      .btn{ width: 100%; }
+    }
+
+
+.dot .tag{
+  position:absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 11px;
+  font-weight: 1000;
+  opacity: 0.95;
+  padding: 4px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.25);
+}
+
+.dot.start{
+  outline: 2px solid rgba(52, 152, 219, 0.9); /* 파랑 */
+  outline-offset: 2px;
+}
+
+.dot.end{
+  outline: 2px solid rgba(241, 196, 15, 0.95); /* 노랑 */
+  outline-offset: 2px;
+}
+
+
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <div class="head">
+        <div>
+          <h1>패턴 기억 게임</h1>
+          <div class="mini">3초간 패턴이 표시됩니다. 같은 순서로 점을 이어서 입력하세요. (대각선 가능)</div>
+        </div>
+        <div class="mini" id="stateMini">상태: 준비</div>
+      </div>
+
+      <div class="controls">
+        <div class="controls-left">
+          <select class="select" id="diffSelect">
+            <option value="3">3x3 (패턴 5개)</option>
+            <option value="4" selected>4x4 (패턴 8개)</option>
+            <option value="5">5x5 (패턴 12개)</option>
+          </select>
+          <button class="btn primary" id="startBtn">시작</button>
+          <button class="btn ghost" id="restartBtn">재시작</button>
+        </div>
+        <div class="controls-right">
+          <button class="btn ghost" id="homeBtn">홈으로</button>
+        </div>
+      </div>
+
+
+      <div class="arena">
+        <div class="board" id="board">
+          <svg id="svg"></svg>
+          <div class="dots" id="dots"></div>
+        </div>
+        <div class="status">
+          <div id="statusLeft">시작을 누르면 패턴이 3초간 표시됩니다.</div>
+          <div id="statusRight">규칙: 인접(가로/세로/대각선)만 연결</div>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="t">라운드</div>
+          <div class="v" id="kpiRound">0 / 10</div>
+        </div>
+        <div class="kpi">
+          <div class="t">성공</div>
+          <div class="v" id="kpiWin">0</div>
+        </div>
+        <div class="kpi">
+          <div class="t">현재 입력</div>
+          <div class="v" id="kpiStep">0 / 0</div>
+        </div>
+        <div class="kpi">
+          <div class="t">총 시간</div>
+          <div class="v" id="kpiTime">0.0 s</div>
+        </div>
+      </div>
+
+
+      <div class="history" id="history"></div>
+    </div>
+  </div>
+
+  <script src="/static/js/pattern_memory.js"></script>
+</body>
+</html>

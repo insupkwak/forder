@@ -4,6 +4,7 @@ import re
 import sqlite3
 from datetime import datetime
 import os
+from flask import render_template, make_response
 
 from utils_zip import zip_folders_from_paths, zip_files_from_templates
 
@@ -13,101 +14,131 @@ app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024  # 50MB
 
 
 # ===========================
-# 방문자 카운터 (Total + Today)
-# - 기존 visit_log 스키마가 달라도 자동으로 정리
+# 방문자 카운터 (Total + Today) + 1시간 쿨다운
+# - 동일 브라우저(쿠키) 기준으로 1시간 내 재방문은 카운트 X
 # ===========================
-import os
-import sqlite3
-from datetime import datetime
-from flask import g, request
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
 os.makedirs(INSTANCE_DIR, exist_ok=True)
 
-DB_PATH = os.path.join(INSTANCE_DIR, "visit.db")
+VISIT_DB_PATH = os.path.join(INSTANCE_DIR, "visit.db")
 
-def get_db():
+VISITOR_COOKIE = "vw_visitor"         # visitor_key 저장
+VISITOR_LAST_COOKIE = "vw_last"       # 마지막 카운트 시각(UTC epoch) 저장
+COOLDOWN_SECONDS = 3600               # 1시간
+
+def visit_db():
     if "visit_db" not in g:
-        g.visit_db = sqlite3.connect(DB_PATH, timeout=10)
+        g.visit_db = sqlite3.connect(VISIT_DB_PATH, timeout=10)
         g.visit_db.row_factory = sqlite3.Row
     return g.visit_db
 
 @app.teardown_appcontext
 def close_visit_db(exc):
     conn = g.pop("visit_db", None)
-    if conn is not None:
+    if conn:
         conn.close()
 
-def table_has_column(conn, table_name, column_name) -> bool:
-    rows = conn.execute(f"PRAGMA table_info({table_name})").fetchall()
-    cols = [r["name"] for r in rows]
-    return column_name in cols
-
 def ensure_visit_tables():
-    conn = get_db()
-
-    # visit_log가 존재하는지 확인
-    row = conn.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name='visit_log'"
-    ).fetchone()
-
-    if row:
-        # 기존 visit_log에 visitor_key 컬럼이 있으면(예전 스키마) -> 드랍하고 새로 생성
-        if table_has_column(conn, "visit_log", "visitor_key"):
-            conn.execute("DROP TABLE IF EXISTS visit_log")
-            conn.commit()
-
-    # 현재 스키마로 생성
+    conn = visit_db()
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS visit_log (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            day TEXT NOT NULL,
-            created_at TEXT NOT NULL
-        )
+      CREATE TABLE IF NOT EXISTS visit_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        day TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        visitor_key TEXT NOT NULL
+      )
     """)
-
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS visit_stats (
-            k TEXT PRIMARY KEY,
-            v INTEGER NOT NULL
-        )
+      CREATE TABLE IF NOT EXISTS visit_stats (
+        k TEXT PRIMARY KEY,
+        v INTEGER NOT NULL
+      )
     """)
     conn.execute("INSERT OR IGNORE INTO visit_stats (k, v) VALUES ('total_visits', 0)")
     conn.commit()
 
-def count_visit():
+def _utc_now():
+    return datetime.utcnow()
+
+def _epoch(dt: datetime) -> int:
+    return int(dt.timestamp())
+
+def _get_or_make_visitor_key():
+    # 쿠키 없으면 새 키 발급
+    vk = request.cookies.get(VISITOR_COOKIE)
+    if vk and len(vk) >= 16:
+        return vk
+    # 충분히 랜덤한 키
+    return os.urandom(16).hex()
+
+def should_count_by_cooldown(now_utc: datetime) -> bool:
+    """
+    쿠키에 저장된 마지막 카운트 시각(vw_last)이 1시간 이내면 카운트하지 않음.
+    """
+    last_s = request.cookies.get(VISITOR_LAST_COOKIE)
+    if not last_s:
+        return True
+    try:
+        last_epoch = int(last_s)
+    except ValueError:
+        return True
+
+    return (_epoch(now_utc) - last_epoch) >= COOLDOWN_SECONDS
+
+def count_visit_if_needed(resp):
+    """
+    홈(/) 접속 시 호출:
+    - 1시간 쿨다운 통과하면 total/today 증가 + 로그 저장
+    - visitor_key / last_ts 쿠키 갱신
+    """
     ensure_visit_tables()
 
-    now = datetime.now()
+    now = _utc_now()
     day = now.strftime("%Y-%m-%d")
-    created_at = now.strftime("%Y-%m-%d %H:%M:%S")
+    vk = _get_or_make_visitor_key()
 
-    conn = get_db()
+    # 1시간 이내 재방문이면 카운트 X, 쿠키만 유지/갱신
+    if not should_count_by_cooldown(now):
+        resp.set_cookie(VISITOR_COOKIE, vk, max_age=60*60*24*365, samesite="Lax")
+        return resp
 
+    conn = visit_db()
+
+    # 전체 방문수 증가
     conn.execute("UPDATE visit_stats SET v = v + 1 WHERE k='total_visits'")
-    conn.execute("INSERT INTO visit_log(day, created_at) VALUES(?, ?)", (day, created_at))
+
+    # 오늘 방문 기록 저장 (visitor_key 포함)
+    conn.execute(
+        "INSERT INTO visit_log(day, created_at, visitor_key) VALUES(?, ?, ?)",
+        (day, now.strftime("%Y-%m-%d %H:%M:%S"), vk)
+    )
     conn.commit()
+
+    # 쿠키 설정: visitor_key(1년), last(1시간 쿨다운 기준)
+    resp.set_cookie(VISITOR_COOKIE, vk, max_age=60*60*24*365, samesite="Lax")
+    resp.set_cookie(VISITOR_LAST_COOKIE, str(_epoch(now)), max_age=COOLDOWN_SECONDS, samesite="Lax")
+
+    return resp
 
 def get_visit_kpis():
     ensure_visit_tables()
-    conn = get_db()
+    conn = visit_db()
 
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = _utc_now().strftime("%Y-%m-%d")
 
-    row = conn.execute("SELECT v FROM visit_stats WHERE k='total_visits'").fetchone()
-    total_visits = int(row["v"]) if row else 0
+    total_visits = conn.execute(
+        "SELECT v FROM visit_stats WHERE k='total_visits'"
+    ).fetchone()["v"]
 
-    row2 = conn.execute("SELECT COUNT(*) AS c FROM visit_log WHERE day=?", (today,)).fetchone()
-    today_visits = int(row2["c"]) if row2 else 0
+    # today는 "오늘 기록된 로그 수"
+    today_visits = conn.execute(
+        "SELECT COUNT(*) AS c FROM visit_log WHERE day=?",
+        (today,)
+    ).fetchone()["c"]
 
     return {"total_visits": total_visits, "today_visits": today_visits}
-
-@app.before_request
-def visitor_counter():
-    if request.path == "/":
-        count_visit()
-
 
 
 
@@ -119,7 +150,9 @@ def visitor_counter():
 @app.route("/")
 def home():
     kpis = get_visit_kpis()
-    return render_template("index.html", kpis=kpis)
+    resp = make_response(render_template("index.html", kpis=kpis))
+    resp = count_visit_if_needed(resp)
+    return resp
 
 @app.route("/folder-builder", methods=["GET", "POST"])
 def folder_builder():
@@ -201,6 +234,11 @@ def number_order():
 @app.route("/memory-numbers")
 def memory_numbers():
     return render_template("memory_numbers.html")
+
+@app.route("/pattern-memory")
+def pattern_memory():
+    return render_template("pattern_memory.html")
+
 
 
 if __name__ == "__main__":
