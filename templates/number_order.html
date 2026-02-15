@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>숫자 순서 누르기</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .wrap{ max-width: 980px; }
+    .panel{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+      padding: 16px;
+    }
+    .head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+    .head h1{ margin:0; font-size: 22px; }
+    .mini{ opacity:0.7; font-size: 12px; }
+
+    .controls{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+    }
+    .controls-left{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; }
+    .controls-right{ display:flex; align-items:center; gap: 10px; }
+
+    .select{
+      min-width: 170px;
+      height: 44px;
+      padding: 0 44px 0 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-weight: 900;
+      font-size: 14px;
+      outline: none;
+
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.85) 50%),
+        linear-gradient(135deg, rgba(255,255,255,0.85) 50%, transparent 50%),
+        linear-gradient(to right, rgba(255,255,255,0.10), rgba(255,255,255,0.10));
+      background-position:
+        calc(100% - 20px) 50%,
+        calc(100% - 14px) 50%,
+        calc(100% - 40px) 50%;
+      background-size:
+        6px 6px,
+        6px 6px,
+        1px 22px;
+      background-repeat: no-repeat;
+    }
+    .select option{ background:#fff; color:#000; }
+
+    .btn{
+      height: 44px;
+      padding: 0 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: inherit;
+      font-weight: 900;
+      font-size: 14px;
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+    }
+    .btn.primary{
+      min-width: 170px;
+      font-size: 16px;
+      background: linear-gradient(135deg, rgba(46,204,113,0.35), rgba(46,204,113,0.18));
+      border-color: rgba(46,204,113,0.6);
+      box-shadow: 0 6px 18px rgba(46,204,113,0.25);
+    }
+    .btn.ghost{ background: rgba(255,255,255,0.04); }
+    .btn:active{ transform: scale(0.99); }
+    .btn[disabled]{ opacity:0.5; cursor:not-allowed; }
+
+    .kpis{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .kpi{
+      min-width:0;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 10px 12px;
+    }
+    .kpi .t{ font-size: 12px; opacity: 0.85; }
+    .kpi .v{ font-size: 20px; font-weight: 1000; margin-top: 4px; }
+
+    .arena{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 14px;
+    }
+
+    .gridbox{
+      display:grid;
+      gap: 10px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .cell{
+      aspect-ratio: 1 / 1;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      cursor: pointer;
+      user-select:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight: 1000;
+      font-size: 20px;
+      letter-spacing: 0.3px;
+    }
+    .cell:active{ transform: scale(0.99); }
+
+    .cell.done{
+      opacity: 0.35;
+      cursor: default;
+    }
+    .cell.good{
+      background: rgba(46,204,113,0.16);
+      border-color: rgba(46,204,113,0.38);
+    }
+    .cell.bad{
+      background: rgba(231,76,60,0.14);
+      border-color: rgba(231,76,60,0.35);
+    }
+
+    .status{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    .history{
+      margin-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      padding-top: 12px;
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.12);
+      font-size: 13px;
+    }
+    .row .l{ opacity:0.75; }
+    .row .r{ font-weight:900; }
+
+    @media (max-width: 900px){
+      .kpis{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .btn.primary{ width: 100%; }
+    }
+    @media (max-width: 640px){
+      .controls{ flex-direction: column; align-items: stretch; }
+      .controls-left, .controls-right{ justify-content: space-between; }
+      .select{ width: 100%; }
+      .btn{ width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <div class="head">
+        <div>
+          <h1>숫자 순서 누르기</h1>
+          <div class="mini">1부터 마지막 숫자까지 순서대로 누르세요. 가장 빠른 기록이 승리입니다.</div>
+        </div>
+        <div class="mini" id="stateMini">상태: 준비</div>
+      </div>
+
+      <div class="controls">
+        <div class="controls-left">
+          <select class="select" id="diffSelect">
+            <option value="3x4">3x4 (12)</option>
+            <option value="4x4" selected>4x4 (16)</option>
+            <option value="5x5">5x5 (25)</option>
+            <option value="6x6">6x6 (36)</option>
+          </select>
+          <button class="btn primary" id="startBtn">시작</button>
+        </div>
+        <div class="controls-right">
+          <button class="btn ghost" id="homeBtn">홈으로</button>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="t">다음 숫자</div>
+          <div class="v" id="kpiNext">1</div>
+        </div>
+        <div class="kpi">
+          <div class="t">진행</div>
+          <div class="v" id="kpiProg">0 / 0</div>
+        </div>
+        <div class="kpi">
+          <div class="t">현재 시간</div>
+          <div class="v" id="kpiTime">0.000 s</div>
+        </div>
+        <div class="kpi">
+          <div class="t">베스트</div>
+          <div class="v" id="kpiBest">-</div>
+        </div>
+      </div>
+
+      <div class="arena">
+        <div class="gridbox" id="gridbox"></div>
+        <div class="status">
+          <div id="statusLeft">시작을 누르면 숫자가 섞여서 배치됩니다.</div>
+          <div id="statusRight">난이도: 4x4</div>
+        </div>
+      </div>
+
+      <div class="history" id="history"></div>
+    </div>
+  </div>
+
+  <script src="/static/js/number_order.js"></script>
+</body>
+</html>
