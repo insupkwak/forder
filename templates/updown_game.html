@@ -278,38 +278,47 @@
   .select{ width:100%; min-width:0; }
   .btn2{ width:100%; }
 }
-
+/* ✅ 모바일: KPI는 3칸 한 줄 유지, 카드 내부는 2줄(라벨/값) */
 @media (max-width: 520px){
-  .panel{ padding:14px; }
-  .arena{ padding:10px; }
-  .screen{ height:52px; font-size:22px; }
-
-  /* 키패드: clamp 버전만 사용(64px 고정 버전 삭제) */
-  .pad{
-    gap:8px;
-    grid-template-columns:repeat(3, clamp(58px, 18vw, 70px));
+  .kpis{
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 8px;
   }
-  .num-btn{
-    width:auto;
-    height:clamp(58px, 18vw, 70px);
-    font-size:20px;
-    border-radius:14px;
-  }
-  .num-btn.util{ font-size:15px; }
 
-  /* KPI 내부도 한 줄로 더 깔끔하게 */
+  /* KPI 카드 안은 다시 세로(2줄)로 */
   .kpi{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
+    display:block;
+    padding: 10px 10px;
   }
+
+  .kpi .t{
+    font-size: 11px;
+    opacity: 0.8;
+    white-space: nowrap;     /* 라벨은 1줄 유지 */
+    overflow: hidden;
+    text-overflow: ellipsis; /* 라벨이 너무 길면 ... */
+  }
+
+  /* 값은 2줄까지 허용해서 "짤림" 방지 */
   .kpi .v{
-    margin-top:0;
-    text-align:right;
-    max-width:65%;
+    margin-top: 6px;
+    font-size: 14px;         /* 기본값보다 살짝 작게 */
+    font-weight: 900;
+    white-space: normal;     /* ✅ 줄바꿈 허용 */
+    overflow: visible;       /* ✅ 잘리지 않게 */
+    text-overflow: clip;
+    line-height: 1.1;
+    word-break: keep-all;
+  }
+
+  /* 상태 배지(DOWN/UP)는 줄바꿈 하지 말고 크기만 줄이기 */
+  .kpi .v.badge{
+    white-space: nowrap;
+    font-size: 12px;
+    padding: 4px 8px;
   }
 }
+
 
 @media (max-width: 380px){
   .pad{ grid-template-columns:repeat(3, clamp(54px, 19vw, 64px)); }
