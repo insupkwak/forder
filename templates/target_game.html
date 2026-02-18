@@ -435,7 +435,72 @@
   .kpi .v{ font-size: 14px; }
 }
 
-    
+    /* 컨트롤 좌/우 레이아웃 */
+.controls{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+}
+
+.controls-left{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.controls-right{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+/* 속도/각도 한 줄 단위 */
+.ctrl-group{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.ctrl-box{
+  flex: 1 1 auto;      /* ✅ 화면 폭에 맞춰 늘어남 */
+  min-width: 0;
+}
+
+/* ✅ 모바일: 속도 한 줄, 각도 한 줄 (2줄로) */
+@media (max-width: 640px){
+  .controls{
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .controls-left{
+    flex-direction: column;   /* ✅ 속도 줄 / 각도 줄로 분리 */
+    width: 100%;
+  }
+
+  .ctrl-group{
+    width: 100%;
+  }
+
+  .ctrl-box{
+    width: 100%;             /* ✅ 값 박스가 화면 폭 채움 */
+  }
+
+  .controls-right{
+    width: 100%;
+  }
+
+  .btn{
+    flex: 1 1 0;
+  }
+}
+
   </style>
 </head>
 
@@ -466,28 +531,38 @@
       </div>
 
       <div class="controls">
-        <div class="ctrl">
-          <div class="chip">
-            <div class="t">속도</div>
-            <div class="v"><span id="speedText">50</span></div>
-          </div>
-          <button class="btn2" id="speedDown">-</button>
-          <button class="btn2" id="speedUp">+</button>
+  <div class="controls-left">
+    <!-- 속도 한 줄 -->
+    <div class="ctrl-group">
+      <button class="ctrl-btn" id="speedDown">-</button>
 
-          <div class="chip">
-            <div class="t">각도 (deg)</div>
-            <div class="v"><span id="angleText">45</span>°</div>
-          </div>
-          <button class="btn2" id="angleDown">-</button>
-          <button class="btn2" id="angleUp">+</button>
-        </div>
-
-        <div class="ctrl">
-         
-          <button class="btn2 primary" id="fireBtn">발사</button>
-         <button class="btn2 ghost" id="resetBtn">리셋</button>
-        </div>
+      <div class="ctrl-box">
+        <div class="t">속도</div>
+        <div class="v"><span id="speedText">50</span></div>
       </div>
+
+      <button class="ctrl-btn" id="speedUp">+</button>
+    </div>
+
+    <!-- 각도 한 줄 -->
+    <div class="ctrl-group">
+      <button class="ctrl-btn" id="angleDown">-</button>
+
+      <div class="ctrl-box">
+        <div class="t">각도 (deg)</div>
+        <div class="v"><span id="angleText">45</span>°</div>
+      </div>
+
+      <button class="ctrl-btn" id="angleUp">+</button>
+    </div>
+  </div>
+
+  <div class="controls-right">
+    <button class="btn primary" id="fireBtn">발사</button>
+    <button class="btn ghost" id="resetBtn">리셋</button>
+  </div>
+</div>
+
 
       <div class="kpis">
         <div class="kpi range">

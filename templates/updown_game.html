@@ -226,6 +226,28 @@
     }
 
 
+     .header{
+  position: relative;   /* sticky 제거 */
+  width: 100%;
+  backdrop-filter: blur(14px);
+  background: linear-gradient(
+    180deg,
+    rgba(11,16,32,0.85),
+    rgba(11,16,32,0.35)
+  );
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.header-inner{
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+}
+
 /* =========================
    UP / DOWN Badge
 ========================= */
