@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ page_title or "UTIL WEB" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <style>
+    /* =========================
+       Memory Numbers : Page CSS
+    ========================= */
+
+    .wrap{ max-width: 980px; }
+
+    .panel{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+      padding: 16px;
+    }
+
+    .head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+    .head h1{ margin:0; font-size: 22px; }
+    .mini{ opacity:0.7; font-size: 12px; }
+
+    /* 상태 표시 영역 */
+    .stage-box{
+      margin-top: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 14px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    .big-display{
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.12);
+      padding: 14px;
+      min-height: 92px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-weight: 900;
+      letter-spacing: 2px;
+      font-size: 34px;
+      user-select:none;
+    }
+    .big-display.small{ font-size: 26px; letter-spacing: 1px; }
+
+    .subrow{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+      flex-wrap:wrap;
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      white-space: nowrap;
+    }
+    .badge.good{
+      background: rgba(46,204,113,0.16);
+      border-color: rgba(46,204,113,0.38);
+    }
+    .badge.bad{
+      background: rgba(231,76,60,0.14);
+      border-color: rgba(231,76,60,0.35);
+    }
+
+    /* KPI 3칸 한줄 고정 + 각 칸 2줄 */
+    .kpis{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+    .kpi{
+      min-width: 0;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 10px 12px;
+
+      display:flex;
+      flex-direction: column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+    }
+    .kpi .t{
+      font-size: 12px;
+      opacity: 0.85;
+      width: 100%;
+      text-align:center;
+      line-height: 1.1;
+    }
+    .kpi .v{
+      margin-top: 6px;
+      font-size: 16px;
+      font-weight: 800;
+      width: 100%;
+      text-align:center;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    @media (max-width: 640px){
+      .kpis{ gap: 8px; }
+      .kpi{ padding: 9px 10px; }
+      .kpi .t{ font-size: 11px; }
+      .kpi .v{ font-size: 14px; }
+      .big-display{ font-size: 30px; }
+      .big-display.small{ font-size: 22px; }
+    }
+
+    /* 키패드 */
+    .pad-wrap{
+      margin-top: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 14px;
+    }
+
+    .input-box{
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.12);
+      padding: 12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      min-height: 56px;
+      user-select:none;
+    }
+
+    .pad{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .pad-btn{
+      height: 56px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: inherit;
+      font-weight: 900;
+      font-size: 18px;
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pad-btn:active{ transform: scale(0.99); }
+    .pad-btn[disabled]{ opacity: 0.5; cursor:not-allowed; }
+
+    .pad-btn.primary{
+      background: linear-gradient(135deg, rgba(46,204,113,0.35), rgba(46,204,113,0.18));
+      border-color: rgba(46,204,113,0.6);
+      box-shadow: 0 6px 18px rgba(46,204,113,0.25);
+    }
+    .pad-btn.ghost{
+      background: rgba(255,255,255,0.04);
+    }
+    .pad-actions{
+      margin-top: 10px;
+      display:flex;
+      gap: 10px;
+    }
+    .pad-actions .pad-btn{ flex: 1 1 0; height: 52px; }
+
+    /* 기록 테이블 */
+    .score-board{
+      margin-top: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 12px;
+    }
+    .score-title{
+      font-weight: 800;
+      margin-bottom: 8px;
+      opacity: 0.85;
+    }
+    .score-table{
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .score-table th,
+    .score-table td{
+      padding: 6px 8px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .score-table th{ font-weight: 700; opacity: 0.8; }
+
+    /* top 3 rank highlight */
+    .score-table tbody tr:nth-child(1) td:first-child{ color: gold; font-weight: 900; }
+    .score-table tbody tr:nth-child(2) td:first-child{ color: silver; font-weight: 900; }
+    .score-table tbody tr:nth-child(3) td:first-child{ color: #cd7f32; font-weight: 900; }
+  
+  
+  /* 입력창을 이미지처럼 더 크게/중앙 */
+.input-box{
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.12);
+  padding: 14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  min-height: 72px;
+  user-select:none;
+}
+
+/* 키패드 버튼을 좀 더 큼직하게 */
+.pad{
+  margin-top: 14px;
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pad-btn{
+  height: 74px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  color: inherit;
+  font-weight: 900;
+  font-size: 20px;
+  cursor: pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  user-select:none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pad-btn:active{ transform: scale(0.99); }
+.pad-btn[disabled]{ opacity: 0.45; cursor:not-allowed; }
+
+/* 아래 액션 버튼 (스킵/확인) */
+.pad-actions{
+  margin-top: 16px;
+  display:flex;
+  gap: 12px;
+  max-width: 360px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.pad-actions .pad-btn{
+  flex: 1 1 0;
+  height: 58px;
+  font-size: 16px;
+  border-radius: 18px;
+}
+
+/* 확인(파랑) */
+.pad-btn.info{
+  background: linear-gradient(135deg, rgba(52,152,219,0.42), rgba(52,152,219,0.18));
+  border-color: rgba(52,152,219,0.65);
+  box-shadow: 0 8px 22px rgba(52,152,219,0.22);
+}
+
+/* 스킵(노랑) */
+.pad-btn.warn{
+  background: linear-gradient(135deg, rgba(241,196,15,0.42), rgba(241,196,15,0.18));
+  border-color: rgba(241,196,15,0.65);
+  box-shadow: 0 8px 22px rgba(241,196,15,0.18);
+}
+
+/* CLR / ← 는 살짝 덜 강조 */
+.pad-btn.ghost{
+  background: rgba(255,255,255,0.04);
+}
+
+/* 모바일에서 키패드 꽉 차게 */
+@media (max-width: 640px){
+  .pad, .pad-actions{
+    max-width: 100%;
+  }
+  .pad-btn{ height: 70px; }
+  .input-box{ font-size: 24px; min-height: 68px; }
+}
+
+  .header{
+  position: relative;   /* sticky/fixed 제거 */
+  width: 100%;
+}
+
+  
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a class="brand" href="/">
+        <div class="logo"></div>
+        <div class="brand-title">
+          <b>UTIL WEB</b>
+          <span>Mini games</span>
+        </div>
+      </a>
+      <div class="nav">
+        <a class="btn small" href="/">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="panel">
+      <div class="head">
+        <div>
+          <h1>숫자 외우기</h1>
+          <div class="mini">10초 동안 숫자를 외우고, 키패드로 입력하세요. 맞추면 자리수가 계속 늘어납니다.</div>
+        </div>
+        <div class="mini" id="bestText">Best Stage: -</div>
+      </div>
+
+      <div class="stage-box">
+        <div class="big-display" id="displayBox">READY</div>
+        <div class="subrow">
+          <div id="statusLeft">시작을 누르세요.</div>
+          <div><span class="badge" id="modeBadge">READY</span></div>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="t">단계</div>
+          <div class="v" id="kStage">5</div>
+        </div>
+        <div class="kpi">
+          <div class="t">카운트다운</div>
+          <div class="v" id="kTimer">10s</div>
+        </div>
+        <div class="kpi">
+          <div class="t">상태</div>
+          <div class="v" id="kState">READY</div>
+        </div>
+      </div>
+
+<div class="pad-wrap">
+  <div class="input-box" id="inputBox">-</div>
+
+  <div class="pad" id="pad">
+    <button class="pad-btn" data-key="1">1</button>
+    <button class="pad-btn" data-key="2">2</button>
+    <button class="pad-btn" data-key="3">3</button>
+
+    <button class="pad-btn" data-key="4">4</button>
+    <button class="pad-btn" data-key="5">5</button>
+    <button class="pad-btn" data-key="6">6</button>
+
+    <button class="pad-btn" data-key="7">7</button>
+    <button class="pad-btn" data-key="8">8</button>
+    <button class="pad-btn" data-key="9">9</button>
+
+    <button class="pad-btn ghost" data-action="clr">CLR</button>
+    <button class="pad-btn" data-key="0">0</button>
+    <button class="pad-btn ghost" data-action="back">←</button>
+  </div>
+
+<div class="pad-actions">
+  <button class="pad-btn primary" id="startBtn">시작</button>
+  <button class="pad-btn warn" id="skipBtn" disabled>스킵</button>
+  <button class="pad-btn info" id="submitBtn" disabled>확인</button>
+</div>
+
+</div>
+
+
+      <div class="score-board">
+        <div class="score-title">기록 TOP 10</div>
+        <table class="score-table">
+          <thead>
+            <tr>
+              <th>순위</th>
+              <th>날짜시간</th>
+              <th>단계</th>
+            </tr>
+          </thead>
+          <tbody id="scoreTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/digit_sequence_game.js') }}"></script>
+</body>
+</html>

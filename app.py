@@ -248,5 +248,10 @@ def target_game():
     return render_template("target_game.html", page_title="타겟 맞추기")
 
 
+@app.route("/digit-sequence")
+def digit_sequence():
+    return render_template("digit_sequence_game.html", page_title="숫자 외우기")
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
