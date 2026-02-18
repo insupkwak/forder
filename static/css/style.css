@@ -11,11 +11,36 @@
 }
 
 *{ box-sizing:border-box; }
-html,body{ height:100%; }
+
+/* ✅ 높이/배경 안정화 */
+html,body{ height:100%; min-height:100%; }
+
 body{
   margin:0;
+  min-height: 100vh;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
   color: var(--text);
+
+  background:
+    radial-gradient(900px 600px at 20% 10%, rgba(255,255,255,0.10), transparent 60%),
+    radial-gradient(800px 600px at 80% 20%, rgba(255,255,255,0.08), transparent 55%),
+    radial-gradient(900px 700px at 60% 90%, rgba(255,255,255,0.06), transparent 60%),
+    linear-gradient(180deg, #070a14 0%, #0b1020 45%, #070a14 100%);
+
+  /* ✅ 스크롤/뷰포트 경계에서 생기는 줄 방지 */
+  background-attachment: fixed;
+}
+
+/* ✅ (선택이지만 강력) 배경 오버레이로 하단 밴드/줄 완전 차단 */
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  height: auto;
+  pointer-events: none;
+  z-index: -1;
+
+  /* body 배경과 동일하게 한번 더 깔아줌 (브라우저/OS 렌더링 차이로 생기는 밴드 방지) */
   background:
     radial-gradient(900px 600px at 20% 10%, rgba(255,255,255,0.10), transparent 60%),
     radial-gradient(800px 600px at 80% 20%, rgba(255,255,255,0.08), transparent 55%),
@@ -29,6 +54,8 @@ a{ color: inherit; }
   max-width: 1160px;
   margin: 0 auto;
   padding: 28px 18px 60px;
+  /* ✅ wrap이 배경색을 덮지 않도록 */
+  background: transparent;
 }
 
 .header{
@@ -356,7 +383,6 @@ textarea{ resize: vertical; }
   .kpi{ grid-template-columns: 1fr; }
 }
 
-
 /* 🔥 시작 버튼 강조 */
 .big-start{
   width: 100%;
@@ -375,7 +401,6 @@ textarea{ resize: vertical; }
   transform: translateY(-2px);
   box-shadow: 0 12px 32px rgba(80,255,160,0.6);
 }
-
 
 .top-bar{
   display:flex;

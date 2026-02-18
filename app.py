@@ -239,6 +239,13 @@ def memory_numbers():
 def pattern_memory():
     return render_template("pattern_memory.html")
 
+@app.route("/updown")
+def updown_game():
+    return render_template("updown_game.html", page_title="업앤다운")
+
+@app.route("/target")
+def target_game():
+    return render_template("target_game.html", page_title="타겟 맞추기")
 
 
 if __name__ == "__main__":

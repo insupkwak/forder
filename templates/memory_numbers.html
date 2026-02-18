@@ -130,25 +130,31 @@
       background: rgba(255,255,255,0.04);
       padding: 14px;
     }
-    .gridbox{
-      display:grid;
-      gap: 10px;
-      max-width: 860px;
-      margin: 0 auto;
-    }
-    .cell{
-      aspect-ratio: 1 / 1;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.05);
-      cursor: pointer;
-      user-select:none;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight: 1000;
-      font-size: 30px;
-    }
+.gridbox{
+  display:grid;
+  gap: 10px;
+  width: 100%;        /* ✅ 추가 */
+  max-width: 100%;    /* ✅ 추가 */
+  margin: 0 auto;
+}
+
+.cell{
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+  cursor: pointer;
+  user-select:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 1000;
+  font-size: 30px;
+
+  min-width: 0;       /* ✅ 핵심: 칸이 줄어들 수 있게 */
+  min-height: 0;      /* ✅ 같이 넣어주면 안정적 */
+}
+
     .cell:active{ transform: scale(0.99); }
 
     .cell.hidden{
@@ -209,8 +215,15 @@
       .select{ width: 100%; }
       .btn{ width: 100%; }
     }
-
-
+/* ✅ 추가: 폰에서 6x6도 무조건 화면 안에 */
+@media (max-width: 520px){
+  .arena{ padding: 10px; }
+  .gridbox{ gap: 8px; }
+  .cell{
+    font-size: clamp(14px, 4.8vw, 24px);
+    border-radius: 12px;
+  }
+}
     
   </style>
 </head>

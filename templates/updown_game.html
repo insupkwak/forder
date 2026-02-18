@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ page_title or "UTIL WEB" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <style>
+    .wrap{ max-width: 980px; }
+
+    .panel{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+      padding: 16px;
+    }
+
+    .head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+    .head h1{ margin:0; font-size: 22px; }
+    .mini{ opacity:0.7; font-size: 12px; }
+
+    .controls{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      flex-wrap: wrap;
+    }
+    .controls-left{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; }
+    .controls-right{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; }
+
+    .select{
+      min-width: 190px;
+      height: 44px;
+      padding: 0 44px 0 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-weight: 900;
+      font-size: 14px;
+      outline: none;
+
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.85) 50%),
+        linear-gradient(135deg, rgba(255,255,255,0.85) 50%, transparent 50%),
+        linear-gradient(to right, rgba(255,255,255,0.10), rgba(255,255,255,0.10));
+      background-position:
+        calc(100% - 20px) 50%,
+        calc(100% - 14px) 50%,
+        calc(100% - 40px) 50%;
+      background-size:
+        6px 6px,
+        6px 6px,
+        1px 22px;
+      background-repeat: no-repeat;
+    }
+    .select option{ background:#fff; color:#000; }
+
+    .btn2{
+      height: 44px;
+      padding: 0 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: inherit;
+      font-weight: 900;
+      font-size: 14px;
+      cursor: pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+    }
+    .btn2.primary{
+      background: linear-gradient(135deg, rgba(46,204,113,0.35), rgba(46,204,113,0.18));
+      border-color: rgba(46,204,113,0.6);
+      box-shadow: 0 6px 18px rgba(46,204,113,0.25);
+    }
+    .btn2.ghost{ background: rgba(255,255,255,0.04); }
+    .btn2:active{ transform: scale(0.99); }
+    .btn2[disabled]{ opacity:0.5; cursor:not-allowed; }
+
+    .kpis{
+      margin-top: 12px;
+      display:grid;
+     
+      grid-template-columns: 2fr 1fr 1fr; /* ✅ 첫 칸(현재 범위) 2배 */
+      gap: 10px;
+    }
+    .kpi{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 10px 12px;
+      min-width: 0;
+    }
+    .kpi .t{ font-size: 12px; opacity: 0.85; }
+    .kpi .v{
+      font-size: 16px;
+      font-weight: 800;
+      margin-top: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .arena{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 14px;
+    }
+
+    .inputbox{
+      display:flex;
+      justify-content:center;
+      margin-top: 10px;
+    }
+    .screen{
+      width: 100%;
+      max-width: 460px;
+      height: 56px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.18);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      overflow:hidden;
+      padding: 0 12px;
+    }
+    .screen.muted{ color: rgba(255,255,255,0.45); font-weight: 800; }
+
+    .pad{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: repeat(3, 72px);
+      justify-content:center;
+      gap: 10px;
+    }
+    .num-btn{
+      width:72px; height:72px;
+      border-radius:16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+      cursor:pointer;
+      font-size: 22px;
+      font-weight: 900;
+      color: rgba(255,255,255,0.92);
+      user-select:none;
+    }
+    .num-btn:active{ transform: scale(0.99); }
+    .num-btn.util{
+      font-size: 16px;
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.82);
+    }
+
+    .status{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    .history{
+      margin-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      padding-top: 12px;
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.12);
+      font-size: 13px;
+    }
+    .row .l{ opacity:0.75; }
+    .row .r{ font-weight:900; }
+
+@media (max-width: 860px){
+  .kpis{
+    grid-template-columns: 1fr 1fr; /* ✅ 모바일: 2열 */
+  }
+  .kpi-range{
+    grid-column: 1 / -1; /* ✅ 현재 범위는 한 줄 전체 사용 */
+  }
+}
+    @media (max-width: 520px){
+      .pad{ grid-template-columns: repeat(3, 64px); gap: 8px; }
+      .num-btn{ width:64px; height:64px; }
+    }
+
+
+/* =========================
+   UP / DOWN Badge
+========================= */
+
+.kpi .v.badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+}
+
+/* UP = 빨강 */
+.badge.up{
+  background: linear-gradient(135deg, rgba(255,80,80,0.85), rgba(180,0,0,0.8));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(255,0,0,0.35);
+}
+
+/* DOWN = 파랑 */
+.badge.down{
+  background: linear-gradient(135deg, rgba(80,160,255,0.9), rgba(0,80,200,0.8));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0,120,255,0.35);
+}
+
+/* 정답 = 초록 */
+.badge.correct{
+  background: linear-gradient(135deg, rgba(46,204,113,0.9), rgba(0,150,80,0.85));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(46,204,113,0.4);
+}
+
+
+
+/* ✅ 860px 이하: KPI 2열로 */
+@media (max-width: 860px){
+  .kpis{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ✅ 640px 이하: 컨트롤 세로로, 버튼/셀렉트 풀폭 */
+@media (max-width: 640px){
+  .controls{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .controls-left, .controls-right{
+    width: 100%;
+    justify-content: space-between;
+  }
+  .select{ width: 100%; min-width: 0; }
+  .btn2{ width: 100%; }
+}
+
+/* ✅ 520px 이하: 숫자패드 "화면에 맞춰" 자동 크기 조절 */
+@media (max-width: 520px){
+  .arena{ padding: 10px; }
+  .panel{ padding: 14px; }
+
+  .screen{
+    height: 52px;
+    font-size: 22px;
+  }
+
+  /* 버튼 폭을 뷰포트 기반으로 계산: 너무 작아지지 않게 clamp */
+  .pad{
+    gap: 8px;
+    grid-template-columns: repeat(3, clamp(58px, 18vw, 70px));
+  }
+  .num-btn{
+    width: auto;               /* grid 너비 따름 */
+    height: clamp(58px, 18vw, 70px);
+    font-size: 20px;
+    border-radius: 14px;
+  }
+  .num-btn.util{
+    font-size: 15px;
+  }
+}
+
+/* ✅ 380px 이하: 더 작은 폰에서도 최소 가독성 */
+@media (max-width: 380px){
+  .pad{
+    grid-template-columns: repeat(3, clamp(54px, 19vw, 64px));
+  }
+  .num-btn{
+    height: clamp(54px, 19vw, 64px);
+    font-size: 18px;
+  }
+}
+    /* =========================
+   UP / DOWN Badge
+========================= */
+
+.kpi .v.badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+}
+
+/* UP = 빨강 */
+.badge.up{
+  background: linear-gradient(135deg, rgba(255,80,80,0.85), rgba(180,0,0,0.8));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(255,0,0,0.35);
+}
+
+/* DOWN = 파랑 */
+.badge.down{
+  background: linear-gradient(135deg, rgba(80,160,255,0.9), rgba(0,80,200,0.8));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0,120,255,0.35);
+}
+
+/* 정답 = 초록 */
+.badge.correct{
+  background: linear-gradient(135deg, rgba(46,204,113,0.9), rgba(0,150,80,0.85));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(46,204,113,0.4);
+}
+
+  </style>
+</head>
+
+<body>
+  <header class="header">
+
+    <div class="header-inner">
+      <a class="brand" href="/">
+        <div class="logo"></div>
+        <div class="brand-title">
+          <b>UTIL WEB</b>
+          <span>Mini games</span>
+        </div>
+      </a>
+      <div class="nav">
+        <a class="btn small" href="/">Home</a>
+      </div>
+    
+  </header>
+
+  <div class="wrap">
+    <section class="panel">
+      <div class="head">
+        <div>
+          <h1>업앤다운</h1>
+          <div class="mini">버튼으로 숫자를 입력하고, 최소 횟수로 맞추세요.</div>
+        </div>
+        
+      </div>
+
+      <div class="controls">
+        <div class="controls-left">
+          <select class="select" id="level">
+            <option value="100">난이도: 100 (1~100)</option>
+            <option value="1000">난이도: 1000 (1~1000)</option>
+            <option value="10000">난이도: 10000 (1~10000)</option>
+            <option value="100000">난이도: 100000 (1~100000)</option>
+          </select>
+          <button class="btn2 ghost" id="newGameBtn">새 게임</button>
+        </div>
+        <div class="controls-right">
+          <button class="btn2 primary" id="submitBtn">확인</button>
+        </div>
+      </div>
+
+<div class="kpis">
+  <div class="kpi kpi-range">
+    <div class="t">현재 범위</div>
+    <div class="v" id="kRange">1 ~ 100</div>
+  </div>
+
+  <div class="kpi">
+    <div class="t">시도 횟수</div>
+    <div class="v" id="kTries">0</div>
+  </div>
+
+  <div class="kpi">
+    <div class="t">상태</div>
+    <div class="v" id="kHint">-</div>
+  </div>
+</div>
+
+
+
+      <div class="arena">
+        <div class="inputbox">
+          <div class="screen muted" id="screen">숫자 입력</div>
+        </div>
+
+        <div class="pad" id="pad"></div>
+
+        <div class="status">
+          <div id="statusLeft">난이도를 선택하고 시작하세요.</div>
+          <div id="statusRight">-</div>
+        </div>
+
+        <div class="history" id="history"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/updown_game.js') }}"></script>
+</body>
+</html>

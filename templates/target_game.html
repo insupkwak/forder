@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ page_title or "UTIL WEB" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <style>
+    .wrap{ max-width: 980px; }
+
+    .panel{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+      padding: 16px;
+    }
+    .head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+    .head h1{ margin:0; font-size: 22px; }
+    .mini{ opacity:0.7; font-size: 12px; }
+
+    .controls{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      flex-wrap: wrap;
+    }
+
+    .ctrl{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.14);
+      padding: 10px 12px;
+      min-width: 220px;
+    }
+    .chip .t{ font-size: 12px; opacity:0.8; }
+    .chip .v{ margin-top: 6px; font-size: 16px; font-weight: 900; }
+
+    .btn2{
+      height: 44px;
+      padding: 0 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: inherit;
+      font-weight: 900;
+      font-size: 14px;
+      cursor: pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+      min-width: 54px;
+    }
+    .btn2.primary{
+      min-width: 160px;
+      background: linear-gradient(135deg, rgba(46,204,113,0.35), rgba(46,204,113,0.18));
+      border-color: rgba(46,204,113,0.6);
+      box-shadow: 0 6px 18px rgba(46,204,113,0.25);
+    }
+    .btn2.ghost{
+      background: rgba(255,255,255,0.04);
+    }
+    .btn2:active{ transform: scale(0.99); }
+    .btn2[disabled]{ opacity:0.5; cursor:not-allowed; }
+
+    .kpis{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 10px;
+    }
+    .kpi{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 10px 12px;
+      min-width: 0;
+    }
+    .kpi .t{ font-size: 12px; opacity: 0.85; }
+    .kpi .v{
+      font-size: 16px;
+      font-weight: 800;
+      margin-top: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .arena{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 14px;
+    }
+
+    .canvas-wrap{
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.12);
+      overflow:hidden;
+    }
+    canvas{
+      display:block;
+      width: 100%;
+      height: auto;
+    }
+
+    .status{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+    }
+    .badge.good{
+      background: rgba(46,204,113,0.16);
+      border-color: rgba(46,204,113,0.38);
+    }
+    .badge.bad{
+      background: rgba(231,76,60,0.14);
+      border-color: rgba(231,76,60,0.35);
+    }
+
+ .header{
+  position: relative;   /* sticky 제거 */
+  width: 100%;
+  backdrop-filter: blur(14px);
+  background: linear-gradient(
+    180deg,
+    rgba(11,16,32,0.85),
+    rgba(11,16,32,0.35)
+  );
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.header-inner{
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+}
+
+
+
+    @media (max-width: 860px){
+      .kpis{ grid-template-columns: 1fr 1fr; }
+      .kpi.range{ grid-column: 1 / -1; }
+    }
+    @media (max-width: 640px){
+      .controls{ flex-direction: column; align-items: stretch; }
+      .ctrl{ justify-content: space-between; }
+      .btn2.primary{ width: 100%; }
+      .chip{ min-width: 0; width: 100%; }
+    }
+
+/* =========================
+   타겟 맞추기 : 레이아웃 최종본
+========================= */
+
+.wrap{ max-width: 980px; }
+
+.panel{
+  margin-top: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+  padding: 16px;
+}
+
+.head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap: 10px;
+  flex-wrap:wrap;
+}
+.head h1{ margin:0; font-size: 22px; }
+.mini{ opacity:0.7; font-size: 12px; }
+
+/* ✅ 컨트롤 전체 박스 */
+.controls{
+  margin-top: 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+}
+
+/* ✅ 좌측(속도/각도) + 우측(리셋/발사) */
+.controls-left{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.controls-right{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+/* ✅ 속도/각도 한 덩어리 그룹(정렬 핵심) */
+.ctrl-group{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* 값 표시 박스 */
+.ctrl-box{
+  min-width: 220px;
+  height: 64px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.ctrl-box .t{
+  font-size: 12px;
+  opacity: 0.85;
+}
+.ctrl-box .v{
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+/* - / + 버튼 */
+.ctrl-btn{
+  width: 58px;
+  height: 64px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  color: inherit;
+  font-weight: 900;
+  font-size: 20px;
+  cursor: pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  user-select:none;
+}
+.ctrl-btn:active{ transform: scale(0.99); }
+.ctrl-btn[disabled]{ opacity:0.5; cursor:not-allowed; }
+
+/* 리셋 / 발사 */
+.btn{
+  height: 64px;
+  padding: 0 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  color: inherit;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  user-select:none;
+  white-space: nowrap;
+}
+.btn.primary{
+  min-width: 180px;
+  background: linear-gradient(135deg, rgba(46,204,113,0.35), rgba(46,204,113,0.18));
+  border-color: rgba(46,204,113,0.6);
+  box-shadow: 0 6px 18px rgba(46,204,113,0.25);
+}
+.btn.ghost{ background: rgba(255,255,255,0.04); }
+.btn:active{ transform: scale(0.99); }
+.btn[disabled]{ opacity:0.5; cursor:not-allowed; }
+
+/* KPI 줄 */
+.kpis{
+  margin-top: 12px;
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+.kpi{
+  min-width:0;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  padding: 10px 12px;
+}
+.kpi .t{ font-size: 12px; opacity: 0.85; }
+.kpi .v{
+  font-size: 16px;
+  font-weight: 800;
+  margin-top: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 캔버스 영역 */
+.arena{
+  margin-top: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  padding: 14px;
+}
+
+/* 상태줄 */
+.status{
+  margin-top: 12px;
+  display:flex;
+  justify-content:space-between;
+  gap: 10px;
+  flex-wrap:wrap;
+  align-items:center;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* ✅ 모바일 최적화: 정렬 깨짐 방지 (핵심) */
+@media (max-width: 900px){
+  .ctrl-box{ min-width: 200px; }
+  .btn.primary{ min-width: 160px; }
+}
+
+@media (max-width: 640px){
+  /* 컨트롤은 2줄로 깔끔하게 */
+  .controls{
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .controls-left{
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .ctrl-group{
+    flex: 1 1 0;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .ctrl-box{
+    min-width: 0;
+    flex: 1 1 auto;
+    height: 58px;
+  }
+
+  .ctrl-box .v{ font-size: 20px; }
+
+  .ctrl-btn{
+    width: 52px;
+    height: 58px;
+    border-radius: 14px;
+  }
+
+  .controls-right{
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .btn{
+    height: 58px;
+    flex: 1 1 0;
+  }
+
+  .btn.primary{
+    min-width: 0;
+    flex: 2 1 0;
+  }
+
+  /* KPI는 모바일에서도 3칸 동일폭 */
+  .kpis{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .kpi{ padding: 9px 10px; }
+  .kpi .v{ font-size: 14px; }
+}
+
+    
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a class="brand" href="/">
+        <div class="logo"></div>
+        <div class="brand-title">
+          <b>UTIL WEB</b>
+          <span>Mini games</span>
+        </div>
+      </a>
+      <div class="nav">
+        <a class="btn small" href="/">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="panel">
+      <div class="head">
+        <div>
+          <h1>타겟 맞추기</h1>
+          <div class="mini">속도/각도를 조절하고 발사하세요. 10회 평균 거리가 기록입니다.</div>
+        </div>
+        <div class="mini" id="bestText">Best Avg: -</div>
+      </div>
+
+      <div class="controls">
+        <div class="ctrl">
+          <div class="chip">
+            <div class="t">속도</div>
+            <div class="v"><span id="speedText">50</span></div>
+          </div>
+          <button class="btn2" id="speedDown">-</button>
+          <button class="btn2" id="speedUp">+</button>
+
+          <div class="chip">
+            <div class="t">각도 (deg)</div>
+            <div class="v"><span id="angleText">45</span>°</div>
+          </div>
+          <button class="btn2" id="angleDown">-</button>
+          <button class="btn2" id="angleUp">+</button>
+        </div>
+
+        <div class="ctrl">
+         
+          <button class="btn2 primary" id="fireBtn">발사</button>
+         <button class="btn2 ghost" id="resetBtn">리셋</button>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi range">
+          <div class="t">라운드</div>
+          <div class="v" id="kRound">1 / 10</div>
+        </div>
+        <div class="kpi">
+          <div class="t">이번 거리</div>
+          <div class="v" id="kLast">-</div>
+        </div>
+        <div class="kpi">
+          <div class="t">평균 거리</div>
+          <div class="v" id="kAvg">-</div>
+        </div>
+      </div>
+
+      <div class="arena">
+        <div class="canvas-wrap">
+          <canvas id="cv" width="900" height="520"></canvas>
+        </div>
+
+        <div class="status">
+          <div id="statusLeft">타겟은 매 라운드 랜덤 위치입니다.</div>
+          <div id="statusRight"><span class="badge" id="resultBadge">READY</span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/target_shot.js') }}"></script>
+</body>
+</html>
