@@ -146,8 +146,8 @@ function setHint(text) {
     }
 
     if (guess < minBound || guess > maxBound) {
-      setHint("현재 범위 밖");
-      pushRow(`시도 ${tries + 1}`, `${guess} (현재 범위 밖)`);
+      setHint("범위 밖");
+      pushRow(`시도 ${tries + 1}`, `${guess} (범위 밖)`);
       input = "";
       setScreen();
       return;
