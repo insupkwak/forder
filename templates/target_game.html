@@ -7,199 +7,11 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
   <style>
-    .wrap{ max-width: 980px; }
-
-    .panel{
-      margin-top: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.05);
-      box-shadow: 0 18px 60px rgba(0,0,0,0.25);
-      padding: 16px;
-    }
-    .head{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap: 10px;
-      flex-wrap:wrap;
-    }
-    .head h1{ margin:0; font-size: 22px; }
-    .mini{ opacity:0.7; font-size: 12px; }
-
-    .controls{
-      margin-top: 12px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap: 12px;
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.04);
-      flex-wrap: wrap;
-    }
-
-    .ctrl{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .chip{
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.14);
-      padding: 10px 12px;
-      min-width: 220px;
-    }
-    .chip .t{ font-size: 12px; opacity:0.8; }
-    .chip .v{ margin-top: 6px; font-size: 16px; font-weight: 900; }
-
-    .btn2{
-      height: 44px;
-      padding: 0 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.06);
-      color: inherit;
-      font-weight: 900;
-      font-size: 14px;
-      cursor: pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      user-select:none;
-      min-width: 54px;
-    }
-    .btn2.primary{
-      min-width: 160px;
-      background: linear-gradient(135deg, rgba(46,204,113,0.35), rgba(46,204,113,0.18));
-      border-color: rgba(46,204,113,0.6);
-      box-shadow: 0 6px 18px rgba(46,204,113,0.25);
-    }
-    .btn2.ghost{
-      background: rgba(255,255,255,0.04);
-    }
-    .btn2:active{ transform: scale(0.99); }
-    .btn2[disabled]{ opacity:0.5; cursor:not-allowed; }
-
-    .kpis{
-      margin-top: 12px;
-      display:grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: 10px;
-    }
-    .kpi{
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.04);
-      padding: 10px 12px;
-      min-width: 0;
-    }
-    .kpi .t{ font-size: 12px; opacity: 0.85; }
-    .kpi .v{
-      font-size: 16px;
-      font-weight: 800;
-      margin-top: 6px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .arena{
-      margin-top: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.04);
-      padding: 14px;
-    }
-
-    .canvas-wrap{
-      width: 100%;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.12);
-      overflow:hidden;
-    }
-    canvas{
-      display:block;
-      width: 100%;
-      height: auto;
-    }
-
-    .status{
-      margin-top: 12px;
-      display:flex;
-      justify-content:space-between;
-      gap: 10px;
-      flex-wrap:wrap;
-      align-items:center;
-      font-size: 13px;
-      opacity: 0.85;
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 13px;
-      letter-spacing: 0.3px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.05);
-    }
-    .badge.good{
-      background: rgba(46,204,113,0.16);
-      border-color: rgba(46,204,113,0.38);
-    }
-    .badge.bad{
-      background: rgba(231,76,60,0.14);
-      border-color: rgba(231,76,60,0.35);
-    }
-
- .header{
-  position: relative;   /* sticky 제거 */
-  width: 100%;
-  backdrop-filter: blur(14px);
-  background: linear-gradient(
-    180deg,
-    rgba(11,16,32,0.85),
-    rgba(11,16,32,0.35)
-  );
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-
-.header-inner{
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 14px 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 12px;
-}
-
-
-
-    @media (max-width: 860px){
-      .kpis{ grid-template-columns: 1fr 1fr; }
-      .kpi.range{ grid-column: 1 / -1; }
-    }
-    @media (max-width: 640px){
-      .controls{ flex-direction: column; align-items: stretch; }
-      .ctrl{ justify-content: space-between; }
-      .btn2.primary{ width: 100%; }
-      .chip{ min-width: 0; width: 100%; }
-    }
-
-/* =========================
-   타겟 맞추기 : 레이아웃 최종본
+    /* =========================
+   Target Shot : Clean CSS (Final)
 ========================= */
 
+/* layout */
 .wrap{ max-width: 980px; }
 
 .panel{
@@ -221,70 +33,61 @@
 .head h1{ margin:0; font-size: 22px; }
 .mini{ opacity:0.7; font-size: 12px; }
 
-/* ✅ 컨트롤 전체 박스 */
-.controls{
-  margin-top: 12px;
+/* header (sticky 제거) */
+.header{
+  position: relative;
+  width: 100%;
+  backdrop-filter: blur(14px);
+  background: linear-gradient(180deg, rgba(11,16,32,0.85), rgba(11,16,32,0.35));
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.header-inner{
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 14px 16px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap: 12px;
+}
+
+/* =========================
+   Controls : 3 rows
+   1) speed   (- box +)
+   2) angle   (- box +)
+   3) fire/reset
+========================= */
+
+.controls{
+  margin-top: 12px;
   padding: 12px;
   border-radius: 16px;
   border: 1px solid rgba(255,255,255,0.14);
   background: rgba(255,255,255,0.04);
+
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* ✅ 좌측(속도/각도) + 우측(리셋/발사) */
 .controls-left{
   display:flex;
-  align-items:center;
-  gap: 12px;
-  min-width: 0;
-  flex: 1 1 auto;
-}
-.controls-right{
-  display:flex;
-  align-items:center;
-  gap: 12px;
-  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* ✅ 속도/각도 한 덩어리 그룹(정렬 핵심) */
 .ctrl-group{
   display:flex;
   align-items:center;
   gap: 10px;
-  min-width: 0;
+  width: 100%;
 }
 
-/* 값 표시 박스 */
-.ctrl-box{
-  min-width: 220px;
-  height: 64px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.04);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-}
-.ctrl-box .t{
-  font-size: 12px;
-  opacity: 0.85;
-}
-.ctrl-box .v{
-  margin-top: 6px;
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: 0.2px;
-}
-
-/* - / + 버튼 */
 .ctrl-btn{
-  width: 58px;
-  height: 64px;
-  border-radius: 16px;
+  width: 60px;
+  height: 52px;
+  flex: 0 0 60px;
+  border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.16);
   background: rgba(255,255,255,0.06);
   color: inherit;
@@ -296,19 +99,52 @@
   justify-content:center;
   user-select:none;
 }
-.ctrl-btn:active{ transform: scale(0.99); }
+.ctrl-btn:active{ transform: scale(0.97); }
 .ctrl-btn[disabled]{ opacity:0.5; cursor:not-allowed; }
 
-/* 리셋 / 발사 */
+.ctrl-box{
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 52px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+
+  display:flex;
+  flex-direction: column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.ctrl-box .t{
+  font-size: 11px;
+  opacity: 0.8;
+  line-height: 1.1;
+}
+.ctrl-box .v{
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.controls-right{
+  display:flex;
+  gap: 10px;
+  width: 100%;
+}
+
 .btn{
-  height: 64px;
+  height: 52px;
+  flex: 1 1 0;
   padding: 0 18px;
-  border-radius: 16px;
+  border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.16);
   background: rgba(255,255,255,0.06);
   color: inherit;
   font-weight: 900;
-  font-size: 16px;
+  font-size: 15px;
   cursor: pointer;
   display:flex;
   align-items:center;
@@ -317,7 +153,6 @@
   white-space: nowrap;
 }
 .btn.primary{
-  min-width: 180px;
   background: linear-gradient(135deg, rgba(46,204,113,0.35), rgba(46,204,113,0.18));
   border-color: rgba(46,204,113,0.6);
   box-shadow: 0 6px 18px rgba(46,204,113,0.25);
@@ -326,32 +161,17 @@
 .btn:active{ transform: scale(0.99); }
 .btn[disabled]{ opacity:0.5; cursor:not-allowed; }
 
-/* KPI 줄 */
-.kpis{
-  margin-top: 12px;
-  display:grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  width: 100%;
-}
-.kpi{
-  min-width:0;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.04);
-  padding: 10px 12px;
-}
-.kpi .t{ font-size: 12px; opacity: 0.85; }
-.kpi .v{
-  font-size: 16px;
-  font-weight: 800;
-  margin-top: 6px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* mobile tweak */
+@media (max-width: 640px){
+  .ctrl-btn{ width: 64px; flex: 0 0 64px; height: 52px; }
+  .ctrl-box .v{ font-size: 18px; }
+  .btn{ font-size: 14px; }
 }
 
-/* 캔버스 영역 */
+/* =========================
+   Arena / Canvas / Status
+========================= */
+
 .arena{
   margin-top: 14px;
   border-radius: 18px;
@@ -360,7 +180,19 @@
   padding: 14px;
 }
 
-/* 상태줄 */
+.canvas-wrap{
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.12);
+  overflow:hidden;
+}
+canvas{
+  display:block;
+  width: 100%;
+  height: auto;
+}
+
 .status{
   margin-top: 12px;
   display:flex;
@@ -372,134 +204,117 @@
   opacity: 0.85;
 }
 
-/* ✅ 모바일 최적화: 정렬 깨짐 방지 (핵심) */
-@media (max-width: 900px){
-  .ctrl-box{ min-width: 200px; }
-  .btn.primary{ min-width: 160px; }
+.badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+}
+.badge.good{
+  background: rgba(46,204,113,0.16);
+  border-color: rgba(46,204,113,0.38);
+}
+.badge.bad{
+  background: rgba(231,76,60,0.14);
+  border-color: rgba(231,76,60,0.35);
+}
+
+/* =========================
+   KPI : always 3 columns + center text
+========================= */
+
+.kpis{
+  margin-top: 12px;
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.kpi{
+  min-width: 0;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  padding: 10px 12px;
+
+  display:flex;
+  flex-direction: column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+.kpi .t{
+  font-size: 12px;
+  opacity: 0.85;
+  width: 100%;
+  text-align:center;
+  line-height: 1.1;
+}
+
+.kpi .v{
+  margin-top: 6px;
+  font-size: 16px;
+  font-weight: 800;
+  width: 100%;
+  text-align:center;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 640px){
-  /* 컨트롤은 2줄로 깔끔하게 */
-  .controls{
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .controls-left{
-    width: 100%;
-    justify-content: space-between;
-    gap: 10px;
-  }
-
-  .ctrl-group{
-    flex: 1 1 0;
-    justify-content: space-between;
-    gap: 8px;
-  }
-
-  .ctrl-box{
-    min-width: 0;
-    flex: 1 1 auto;
-    height: 58px;
-  }
-
-  .ctrl-box .v{ font-size: 20px; }
-
-  .ctrl-btn{
-    width: 52px;
-    height: 58px;
-    border-radius: 14px;
-  }
-
-  .controls-right{
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .btn{
-    height: 58px;
-    flex: 1 1 0;
-  }
-
-  .btn.primary{
-    min-width: 0;
-    flex: 2 1 0;
-  }
-
-  /* KPI는 모바일에서도 3칸 동일폭 */
-  .kpis{
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-  }
+  .kpis{ gap: 8px; }
   .kpi{ padding: 9px 10px; }
+  .kpi .t{ font-size: 11px; }
   .kpi .v{ font-size: 14px; }
 }
 
-    /* 컨트롤 좌/우 레이아웃 */
-.controls{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 12px;
+/* =========================
+   Score Table
+========================= */
+
+.score-board{
+  margin-top: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  padding: 12px;
+}
+.score-title{
+  font-weight: 800;
+  margin-bottom: 8px;
+  opacity: 0.85;
 }
 
-.controls-left{
-  display:flex;
-  align-items:center;
-  gap: 12px;
-  flex: 1 1 auto;
-  min-width: 0;
+.score-table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.score-table th,
+.score-table td{
+  padding: 6px 8px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.score-table th{
+  font-weight: 700;
+  opacity: 0.8;
 }
 
-.controls-right{
-  display:flex;
-  align-items:center;
-  gap: 12px;
-  flex: 0 0 auto;
-}
-
-/* 속도/각도 한 줄 단위 */
-.ctrl-group{
-  display:flex;
-  align-items:center;
-  gap: 10px;
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-.ctrl-box{
-  flex: 1 1 auto;      /* ✅ 화면 폭에 맞춰 늘어남 */
-  min-width: 0;
-}
-
-/* ✅ 모바일: 속도 한 줄, 각도 한 줄 (2줄로) */
-@media (max-width: 640px){
-  .controls{
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .controls-left{
-    flex-direction: column;   /* ✅ 속도 줄 / 각도 줄로 분리 */
-    width: 100%;
-  }
-
-  .ctrl-group{
-    width: 100%;
-  }
-
-  .ctrl-box{
-    width: 100%;             /* ✅ 값 박스가 화면 폭 채움 */
-  }
-
-  .controls-right{
-    width: 100%;
-  }
-
-  .btn{
-    flex: 1 1 0;
-  }
-}
+/* top 3 rank highlight (순위 컬럼이 첫번째일 때) */
+.score-table tbody tr:nth-child(1) td:first-child{ color: gold; font-weight: 900; }
+.score-table tbody tr:nth-child(2) td:first-child{ color: silver; font-weight: 900; }
+.score-table tbody tr:nth-child(3) td:first-child{ color: #cd7f32; font-weight: 900; }
 
   </style>
 </head>
@@ -549,7 +364,7 @@
       <button class="ctrl-btn" id="angleDown">-</button>
 
       <div class="ctrl-box">
-        <div class="t">각도 (deg)</div>
+        <div class="t">각도</div>
         <div class="v"><span id="angleText">45</span>°</div>
       </div>
 
@@ -583,15 +398,31 @@
           <div class="t">라운드</div>
           <div class="v" id="kRound">1 / 10</div>
         </div>
-        <div class="kpi">
-          <div class="t">이번 거리</div>
-          <div class="v" id="kLast">-</div>
-        </div>
-        <div class="kpi">
-          <div class="t">평균 거리</div>
-          <div class="v" id="kAvg">-</div>
-        </div>
+<div class="kpi">
+  <div class="t">콤보 상태</div>
+  <div class="v" id="kLast">x1</div>
+</div>
+<div class="kpi">
+  <div class="t">점수</div>
+  <div class="v" id="kAvg">0 점</div>
+</div>
+
       </div>
+<div class="score-board">
+  
+  <table class="score-table">
+    <thead>
+<tr>
+  <th>순위</th>
+  <th>날짜시간</th>
+  <th>점수</th>
+</tr>
+
+    </thead>
+    <tbody id="scoreTableBody">
+    </tbody>
+  </table>
+</div>
 
       </div>
     </section>
