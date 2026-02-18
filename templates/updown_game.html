@@ -7,378 +7,313 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
   <style>
-    .wrap{ max-width: 980px; }
+   /* ===== Layout ===== */
+.wrap{ max-width:980px; }
 
-    .panel{
-      margin-top: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.05);
-      box-shadow: 0 18px 60px rgba(0,0,0,0.25);
-      padding: 16px;
-    }
-
-    .head{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap: 10px;
-      flex-wrap:wrap;
-    }
-    .head h1{ margin:0; font-size: 22px; }
-    .mini{ opacity:0.7; font-size: 12px; }
-
-    .controls{
-      margin-top: 12px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap: 12px;
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.04);
-      flex-wrap: wrap;
-    }
-    .controls-left{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; }
-    .controls-right{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; }
-
-    .select{
-      min-width: 190px;
-      height: 44px;
-      padding: 0 44px 0 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.06);
-      color: #fff;
-      font-weight: 900;
-      font-size: 14px;
-      outline: none;
-
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-
-      background-image:
-        linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.85) 50%),
-        linear-gradient(135deg, rgba(255,255,255,0.85) 50%, transparent 50%),
-        linear-gradient(to right, rgba(255,255,255,0.10), rgba(255,255,255,0.10));
-      background-position:
-        calc(100% - 20px) 50%,
-        calc(100% - 14px) 50%,
-        calc(100% - 40px) 50%;
-      background-size:
-        6px 6px,
-        6px 6px,
-        1px 22px;
-      background-repeat: no-repeat;
-    }
-    .select option{ background:#fff; color:#000; }
-
-    .btn2{
-      height: 44px;
-      padding: 0 18px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.06);
-      color: inherit;
-      font-weight: 900;
-      font-size: 14px;
-      cursor: pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      user-select:none;
-    }
-    .btn2.primary{
-      background: linear-gradient(135deg, rgba(46,204,113,0.35), rgba(46,204,113,0.18));
-      border-color: rgba(46,204,113,0.6);
-      box-shadow: 0 6px 18px rgba(46,204,113,0.25);
-    }
-    .btn2.ghost{ background: rgba(255,255,255,0.04); }
-    .btn2:active{ transform: scale(0.99); }
-    .btn2[disabled]{ opacity:0.5; cursor:not-allowed; }
-
-    .kpis{
-      margin-top: 12px;
-      display:grid;
-     
-      grid-template-columns: 2fr 1fr 1fr; /* ✅ 첫 칸(현재 범위) 2배 */
-      gap: 10px;
-    }
-    .kpi{
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.04);
-      padding: 10px 12px;
-      min-width: 0;
-    }
-    .kpi .t{ font-size: 12px; opacity: 0.85; }
-    .kpi .v{
-      font-size: 16px;
-      font-weight: 800;
-      margin-top: 6px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .arena{
-      margin-top: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.04);
-      padding: 14px;
-    }
-
-    .inputbox{
-      display:flex;
-      justify-content:center;
-      margin-top: 10px;
-    }
-    .screen{
-      width: 100%;
-      max-width: 460px;
-      height: 56px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.18);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      overflow:hidden;
-      padding: 0 12px;
-    }
-    .screen.muted{ color: rgba(255,255,255,0.45); font-weight: 800; }
-
-    .pad{
-      margin-top: 12px;
-      display:grid;
-      grid-template-columns: repeat(3, 72px);
-      justify-content:center;
-      gap: 10px;
-    }
-    .num-btn{
-      width:72px; height:72px;
-      border-radius:16px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.05);
-      box-shadow: 0 18px 60px rgba(0,0,0,0.25);
-      cursor:pointer;
-      font-size: 22px;
-      font-weight: 900;
-      color: rgba(255,255,255,0.92);
-      user-select:none;
-    }
-    .num-btn:active{ transform: scale(0.99); }
-    .num-btn.util{
-      font-size: 16px;
-      background: rgba(255,255,255,0.04);
-      color: rgba(255,255,255,0.82);
-    }
-
-    .status{
-      margin-top: 12px;
-      display:flex;
-      justify-content:space-between;
-      gap: 10px;
-      flex-wrap:wrap;
-      align-items:center;
-      font-size: 13px;
-      opacity: 0.85;
-    }
-
-    .history{
-      margin-top: 14px;
-      border-top: 1px solid rgba(255,255,255,0.10);
-      padding-top: 12px;
-      display:flex;
-      flex-direction:column;
-      gap: 8px;
-    }
-    .row{
-      display:flex;
-      justify-content:space-between;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.12);
-      font-size: 13px;
-    }
-    .row .l{ opacity:0.75; }
-    .row .r{ font-weight:900; }
-
-@media (max-width: 860px){
-  .kpis{
-    grid-template-columns: 1fr 1fr; /* ✅ 모바일: 2열 */
-  }
-  .kpi-range{
-    grid-column: 1 / -1; /* ✅ 현재 범위는 한 줄 전체 사용 */
-  }
-}
-    @media (max-width: 520px){
-      .pad{ grid-template-columns: repeat(3, 64px); gap: 8px; }
-      .num-btn{ width:64px; height:64px; }
-    }
-
-
-     .header{
-  position: relative;   /* sticky 제거 */
-  width: 100%;
-  backdrop-filter: blur(14px);
-  background: linear-gradient(
-    180deg,
-    rgba(11,16,32,0.85),
-    rgba(11,16,32,0.35)
-  );
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+.panel{
+  margin-top:14px;
+  padding:16px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.05);
+  box-shadow:0 18px 60px rgba(0,0,0,0.25);
 }
 
+.head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.head h1{ margin:0; font-size:22px; }
+.mini{ font-size:12px; opacity:0.7; }
+
+.controls{
+  margin-top:12px;
+  padding:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.04);
+}
+.controls-left,.controls-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+/* ===== Inputs ===== */
+.select{
+  min-width:190px;
+  height:44px;
+  padding:0 44px 0 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.16);
+  background:rgba(255,255,255,0.06);
+  color:#fff;
+  font-weight:900;
+  font-size:14px;
+  outline:none;
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.85) 50%),
+    linear-gradient(135deg, rgba(255,255,255,0.85) 50%, transparent 50%),
+    linear-gradient(to right, rgba(255,255,255,0.10), rgba(255,255,255,0.10));
+  background-position:
+    calc(100% - 20px) 50%,
+    calc(100% - 14px) 50%,
+    calc(100% - 40px) 50%;
+  background-size:6px 6px, 6px 6px, 1px 22px;
+  background-repeat:no-repeat;
+}
+.select option{ background:#fff; color:#000; }
+
+.btn2{
+  height:44px;
+  padding:0 18px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.16);
+  background:rgba(255,255,255,0.06);
+  color:inherit;
+  font-weight:900;
+  font-size:14px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  user-select:none;
+}
+.btn2.ghost{ background:rgba(255,255,255,0.04); }
+.btn2.primary{
+  background:linear-gradient(135deg, rgba(46,204,113,0.35), rgba(46,204,113,0.18));
+  border-color:rgba(46,204,113,0.6);
+  box-shadow:0 6px 18px rgba(46,204,113,0.25);
+}
+.btn2:active{ transform:scale(0.99); }
+.btn2[disabled]{ opacity:0.5; cursor:not-allowed; }
+
+/* ===== KPI ===== */
+.kpis{
+  margin-top:12px;
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr;
+  gap:10px;
+}
+.kpi{
+  padding:10px 12px;
+  min-width:0;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.04);
+}
+.kpi .t{ font-size:12px; opacity:0.85; white-space:nowrap; }
+.kpi .v{
+  margin-top:6px;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:clip;              /* ... 대신 글자 축소로 */
+  font-size:clamp(12px, 3.6vw, 18px);
+}
+
+/* ===== Badge (UP/DOWN/CORRECT) ===== */
+.kpi .v.badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  font-weight:900;
+  letter-spacing:0.5px;
+  transition:all 0.2s ease;
+  font-size:clamp(12px, 3.2vw, 14px);
+  padding:clamp(4px, 1.2vw, 6px) clamp(8px, 2.4vw, 12px);
+}
+.badge.up{
+  background:linear-gradient(135deg, rgba(255,80,80,0.85), rgba(180,0,0,0.8));
+  color:#fff;
+  box-shadow:0 6px 18px rgba(255,0,0,0.35);
+}
+.badge.down{
+  background:linear-gradient(135deg, rgba(80,160,255,0.9), rgba(0,80,200,0.8));
+  color:#fff;
+  box-shadow:0 6px 18px rgba(0,120,255,0.35);
+}
+.badge.correct{
+  background:linear-gradient(135deg, rgba(46,204,113,0.9), rgba(0,150,80,0.85));
+  color:#fff;
+  box-shadow:0 6px 18px rgba(46,204,113,0.4);
+}
+
+/* ===== Arena ===== */
+.arena{
+  margin-top:14px;
+  padding:14px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.04);
+}
+
+.inputbox{ display:flex; justify-content:center; margin-top:10px; }
+.screen{
+  width:100%;
+  max-width:460px;
+  height:56px;
+  padding:0 12px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(0,0,0,0.18);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:26px;
+  font-weight:900;
+  letter-spacing:0.5px;
+  overflow:hidden;
+}
+.screen.muted{ color:rgba(255,255,255,0.45); font-weight:800; }
+
+.pad{
+  margin-top:12px;
+  display:grid;
+  justify-content:center;
+  gap:10px;
+  grid-template-columns:repeat(3, 72px);
+}
+.num-btn{
+  width:72px;
+  height:72px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.05);
+  box-shadow:0 18px 60px rgba(0,0,0,0.25);
+  cursor:pointer;
+  font-size:22px;
+  font-weight:900;
+  color:rgba(255,255,255,0.92);
+  user-select:none;
+}
+.num-btn:active{ transform:scale(0.99); }
+.num-btn.util{
+  font-size:16px;
+  background:rgba(255,255,255,0.04);
+  color:rgba(255,255,255,0.82);
+}
+
+.status{
+  margin-top:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  font-size:13px;
+  opacity:0.85;
+}
+
+.history{
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px solid rgba(255,255,255,0.10);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.10);
+  background:rgba(0,0,0,0.12);
+  font-size:13px;
+}
+.row .l{ opacity:0.75; }
+.row .r{ font-weight:900; }
+
+/* ===== Header ===== */
+.header{
+  position:relative;
+  width:100%;
+  backdrop-filter:blur(14px);
+  background:linear-gradient(180deg, rgba(11,16,32,0.85), rgba(11,16,32,0.35));
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
 .header-inner{
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 14px 16px;
+  max-width:1160px;
+  margin:0 auto;
+  padding:14px 16px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap: 12px;
+  gap:12px;
 }
 
-/* =========================
-   UP / DOWN Badge
-========================= */
-
-.kpi .v.badge{
-  display:inline-flex;
-  align-items:center;
+/* ===== Submit (키패드 폭 중앙) ===== */
+.submit-wrap{
+  display:flex;
   justify-content:center;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-weight: 900;
-  font-size: 14px;
-  letter-spacing: 0.5px;
-  transition: all 0.2s ease;
+  margin-top:14px;
+}
+.submit-wrap .btn2{
+  width:100%;
+  max-width:236px; /* 72*3 + gap*2 */
+  height:56px;
+  font-size:16px;
+  border-radius:16px;
 }
 
-/* UP = 빨강 */
-.badge.up{
-  background: linear-gradient(135deg, rgba(255,80,80,0.85), rgba(180,0,0,0.8));
-  color: #fff;
-  box-shadow: 0 6px 18px rgba(255,0,0,0.35);
-}
-
-/* DOWN = 파랑 */
-.badge.down{
-  background: linear-gradient(135deg, rgba(80,160,255,0.9), rgba(0,80,200,0.8));
-  color: #fff;
-  box-shadow: 0 6px 18px rgba(0,120,255,0.35);
-}
-
-/* 정답 = 초록 */
-.badge.correct{
-  background: linear-gradient(135deg, rgba(46,204,113,0.9), rgba(0,150,80,0.85));
-  color: #fff;
-  box-shadow: 0 6px 18px rgba(46,204,113,0.4);
-}
-
-
-
-/* ✅ 860px 이하: KPI 2열로 */
-@media (max-width: 860px){
-  .kpis{
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* ✅ 640px 이하: 컨트롤 세로로, 버튼/셀렉트 풀폭 */
+/* ===== Responsive ===== */
 @media (max-width: 640px){
-  .controls{
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .controls-left, .controls-right{
-    width: 100%;
-    justify-content: space-between;
-  }
-  .select{ width: 100%; min-width: 0; }
-  .btn2{ width: 100%; }
+  .controls{ flex-direction:column; align-items:stretch; }
+  .controls-left,.controls-right{ width:100%; justify-content:space-between; }
+  .select{ width:100%; min-width:0; }
+  .btn2{ width:100%; }
 }
 
-/* ✅ 520px 이하: 숫자패드 "화면에 맞춰" 자동 크기 조절 */
 @media (max-width: 520px){
-  .arena{ padding: 10px; }
-  .panel{ padding: 14px; }
+  .panel{ padding:14px; }
+  .arena{ padding:10px; }
+  .screen{ height:52px; font-size:22px; }
 
-  .screen{
-    height: 52px;
-    font-size: 22px;
-  }
-
-  /* 버튼 폭을 뷰포트 기반으로 계산: 너무 작아지지 않게 clamp */
+  /* 키패드: clamp 버전만 사용(64px 고정 버전 삭제) */
   .pad{
-    gap: 8px;
-    grid-template-columns: repeat(3, clamp(58px, 18vw, 70px));
+    gap:8px;
+    grid-template-columns:repeat(3, clamp(58px, 18vw, 70px));
   }
   .num-btn{
-    width: auto;               /* grid 너비 따름 */
-    height: clamp(58px, 18vw, 70px);
-    font-size: 20px;
-    border-radius: 14px;
+    width:auto;
+    height:clamp(58px, 18vw, 70px);
+    font-size:20px;
+    border-radius:14px;
   }
-  .num-btn.util{
-    font-size: 15px;
+  .num-btn.util{ font-size:15px; }
+
+  /* KPI 내부도 한 줄로 더 깔끔하게 */
+  .kpi{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .kpi .v{
+    margin-top:0;
+    text-align:right;
+    max-width:65%;
   }
 }
 
-/* ✅ 380px 이하: 더 작은 폰에서도 최소 가독성 */
 @media (max-width: 380px){
-  .pad{
-    grid-template-columns: repeat(3, clamp(54px, 19vw, 64px));
-  }
-  .num-btn{
-    height: clamp(54px, 19vw, 64px);
-    font-size: 18px;
-  }
-}
-    /* =========================
-   UP / DOWN Badge
-========================= */
-
-.kpi .v.badge{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-weight: 900;
-  font-size: 14px;
-  letter-spacing: 0.5px;
-  transition: all 0.2s ease;
-}
-
-/* UP = 빨강 */
-.badge.up{
-  background: linear-gradient(135deg, rgba(255,80,80,0.85), rgba(180,0,0,0.8));
-  color: #fff;
-  box-shadow: 0 6px 18px rgba(255,0,0,0.35);
-}
-
-/* DOWN = 파랑 */
-.badge.down{
-  background: linear-gradient(135deg, rgba(80,160,255,0.9), rgba(0,80,200,0.8));
-  color: #fff;
-  box-shadow: 0 6px 18px rgba(0,120,255,0.35);
-}
-
-/* 정답 = 초록 */
-.badge.correct{
-  background: linear-gradient(135deg, rgba(46,204,113,0.9), rgba(0,150,80,0.85));
-  color: #fff;
-  box-shadow: 0 6px 18px rgba(46,204,113,0.4);
+  .pad{ grid-template-columns:repeat(3, clamp(54px, 19vw, 64px)); }
+  .num-btn{ height:clamp(54px, 19vw, 64px); font-size:18px; }
 }
 
   </style>
@@ -421,9 +356,7 @@
           </select>
           <button class="btn2 ghost" id="newGameBtn">새 게임</button>
         </div>
-        <div class="controls-right">
-          <button class="btn2 primary" id="submitBtn">확인</button>
-        </div>
+   
       </div>
 
 <div class="kpis">
@@ -451,6 +384,11 @@
         </div>
 
         <div class="pad" id="pad"></div>
+     
+<div class="submit-wrap">
+  <button class="btn2 primary" id="submitBtn">확인</button>
+</div>
+
 
         <div class="status">
           <div id="statusLeft">난이도를 선택하고 시작하세요.</div>

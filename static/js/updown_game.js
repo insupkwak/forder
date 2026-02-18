@@ -81,23 +81,27 @@ function setHint(text) {
   }
 
   function newGame() {
-    maxN = parseInt(levelEl.value, 10);
-    target = Math.floor(Math.random() * maxN) + 1;
-    minBound = 1;
-    maxBound = maxN;
-    tries = 0;
-    done = false;
-    input = "";
-    history.innerHTML = "";
-    setScreen();
-    fmtRange();
-    kTries.textContent = "0";
-    setHint("-");
-    updateBestUI();
-    statusLeft.textContent = "숫자를 맞춰보세요.";
-    statusRight.textContent = `정답 범위: 1 ~ ${maxN}`;
-    submitBtn.disabled = false;
-  }
+  maxN = parseInt(levelEl.value, 10);
+  target = Math.floor(Math.random() * maxN) + 1;
+  minBound = 1;
+  maxBound = maxN;
+  tries = 0;
+  done = false;
+  input = "";
+  history.innerHTML = "";
+  setScreen();
+  fmtRange();
+  kTries.textContent = "0";
+  setHint("-");
+  statusLeft.textContent = "숫자를 맞춰보세요.";
+  statusRight.textContent = `정답 범위: 1 ~ ${maxN}`;
+
+  // ✅ 확인 버튼 다시 살리기 (필수)
+  submitBtn.disabled = false;
+  submitBtn.removeAttribute("disabled");
+  submitBtn.classList.remove("disabled");
+}
+
 
   function appendDigit(d) {
     if (done) return;
