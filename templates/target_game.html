@@ -316,6 +316,19 @@ canvas{
 .score-table tbody tr:nth-child(2) td:first-child{ color: silver; font-weight: 900; }
 .score-table tbody tr:nth-child(3) td:first-child{ color: #cd7f32; font-weight: 900; }
 
+@media (max-width: 640px){
+
+  .canvas-wrap{
+    aspect-ratio: 900 / 1040;   /* 기존 900x520 → 2배 높이 */
+  }
+
+  canvas{
+    height: 100% !important;
+  }
+}
+
+
+
   </style>
 </head>
 
