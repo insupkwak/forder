@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ page_title or "원주율 외우기" }}</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .wrap{ max-width: 980px; }
+    .panel{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+      padding: 16px;
+    }
+    .head{ display:flex; justify-content:space-between; align-items:flex-end; gap:10px; flex-wrap:wrap; }
+    .head h1{ margin:0; font-size: 22px; }
+    .mini{ opacity:0.7; font-size:12px; }
+
+    .pi-board{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.20);
+      padding: 18px 16px;
+      min-height: 180px;
+      max-height: 260px;
+      overflow-y: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      line-height: 1.6;
+      word-break: break-all;
+      color: rgba(255,255,255,0.95);
+    }
+    .pi-board .typed{ color: rgba(255,255,255,0.95); }
+    .pi-board .cursor{
+      display:inline-block;
+      width:10px;
+      background: rgba(46,204,113,0.85);
+      animation: blink 1s steps(1) infinite;
+      margin: 0 1px;
+      vertical-align: middle;
+      height: 1em;
+    }
+    .pi-board .next-hint{
+      color: rgba(255,255,255,0.18);
+    }
+    .pi-board.bad{
+      border-color: rgba(231,76,60,0.55);
+      background: rgba(231,76,60,0.08);
+    }
+    @keyframes blink { 50% { opacity: 0.0; } }
+
+    .kpis{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .kpi{
+      min-width:0;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 10px 12px;
+      text-align:center;
+    }
+    .kpi .t{ font-size: 12px; opacity: 0.85; }
+    .kpi .v{ font-size: 20px; font-weight: 900; margin-top: 4px; }
+
+    .pad-wrap{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      padding: 14px;
+    }
+    .pad{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 380px;
+      margin-left:auto;
+      margin-right:auto;
+    }
+    .pad-btn{
+      height: 70px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      color: inherit;
+      font-weight: 900;
+      font-size: 22px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pad-btn:active{ transform: scale(0.98); }
+    .pad-btn[disabled]{ opacity: 0.4; cursor: not-allowed; }
+    .pad-btn.flash-good{ background: rgba(46,204,113,0.30); border-color: rgba(46,204,113,0.6); }
+    .pad-btn.flash-bad{ background: rgba(231,76,60,0.28); border-color: rgba(231,76,60,0.6); }
+
+    .pad-actions{
+      margin-top: 12px;
+      display:flex;
+      gap: 12px;
+      max-width: 380px;
+      margin-left:auto;
+      margin-right:auto;
+    }
+    .pad-actions .pad-btn{ flex:1 1 0; height:54px; font-size:16px; }
+    .pad-btn.primary{
+      background: linear-gradient(135deg, rgba(46,204,113,0.35), rgba(46,204,113,0.18));
+      border-color: rgba(46,204,113,0.6);
+    }
+    .pad-btn.ghost{ background: rgba(255,255,255,0.04); }
+
+    .status{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      font-size: 13px;
+      opacity: 0.9;
+    }
+    .badge{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 6px 12px; border-radius: 999px; font-weight: 900; font-size:13px;
+      border:1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.05);
+    }
+    .badge.good{ background: rgba(46,204,113,0.18); border-color: rgba(46,204,113,0.40); }
+    .badge.bad{ background: rgba(231,76,60,0.18); border-color: rgba(231,76,60,0.40); }
+    .badge.gold{
+      background: linear-gradient(135deg, rgba(241,196,15,0.40), rgba(241,196,15,0.18));
+      border-color: rgba(241,196,15,0.65);
+      color: #fffbe8;
+    }
+
+    .clear-banner{
+      margin-top: 14px;
+      padding: 18px;
+      text-align:center;
+      border-radius: 18px;
+      border: 1px solid rgba(241,196,15,0.65);
+      background: linear-gradient(135deg, rgba(241,196,15,0.18), rgba(241,196,15,0.05));
+      font-weight: 1000;
+      font-size: 20px;
+      letter-spacing: 1px;
+      line-height: 1.5;
+      display:none;
+    }
+
+    @media (max-width: 640px){
+      .wrap{ padding-left:10px; padding-right:10px; }
+      .panel{ padding: 12px; }
+      .kpis{ grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+      .kpi{ padding: 8px 6px; }
+      .kpi .t{ font-size: 11px; }
+      .kpi .v{ font-size: 14px; font-weight:900; }
+      .pi-board{
+        font-size: 17px;
+        letter-spacing: 1px;
+        max-height: 200px;
+        padding: 14px 12px;
+      }
+      .pad{ max-width: 100%; gap: 10px; }
+      .pad-btn{ height: 60px; font-size: 20px; border-radius: 14px; }
+      .pad-actions{ max-width: 100%; gap: 10px; }
+      .clear-banner{ font-size: 16px; padding: 14px; }
+    }
+    @media (max-width: 360px){
+      .pi-board{ font-size: 15px; letter-spacing: 0.5px; }
+      .pad-btn{ height: 54px; font-size: 18px; }
+      .kpi .v{ font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a class="brand" href="/">
+        <div class="logo"></div>
+        <div class="brand-title">
+          <b>UTIL WEB</b>
+          <span>원주율 외우기</span>
+        </div>
+      </a>
+      <div class="nav">
+        <a class="btn small" href="/">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="panel">
+      <div class="head">
+        <div>
+          <h1>원주율 외우기</h1>
+          <div class="mini">3.14… 키패드로 한 자리씩 입력하세요. 틀리면 종료, {{ pi_total }}자리를 모두 맞히면 클리어!</div>
+        </div>
+        <div class="mini" id="stateMini">상태: 준비</div>
+      </div>
+
+      <div class="pi-board" id="piBoard">
+        <span class="typed">3.</span><span class="cursor"></span>
+      </div>
+
+      <div class="clear-banner" id="clearBanner">
+        정말 대단합니다!!! {{ pi_total }}자리를 맞추다니!!
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="t">맞춘 자리</div>
+          <div class="v" id="kCount">0 / {{ pi_total }}</div>
+        </div>
+        <div class="kpi">
+          <div class="t">경과 시간</div>
+          <div class="v" id="kTime">0.000 s</div>
+        </div>
+        <div class="kpi">
+          <div class="t">상태</div>
+          <div class="v"><span class="badge" id="kBadge">READY</span></div>
+        </div>
+      </div>
+
+      <div class="pad-wrap">
+        <div class="pad" id="pad">
+          <button class="pad-btn" data-key="1">1</button>
+          <button class="pad-btn" data-key="2">2</button>
+          <button class="pad-btn" data-key="3">3</button>
+          <button class="pad-btn" data-key="4">4</button>
+          <button class="pad-btn" data-key="5">5</button>
+          <button class="pad-btn" data-key="6">6</button>
+          <button class="pad-btn" data-key="7">7</button>
+          <button class="pad-btn" data-key="8">8</button>
+          <button class="pad-btn" data-key="9">9</button>
+          <button class="pad-btn ghost" data-key="0" style="grid-column: 2;">0</button>
+        </div>
+
+        <div class="pad-actions">
+          <button class="pad-btn primary" id="startBtn">시작</button>
+          <button class="pad-btn ghost" id="resetBtn">초기화</button>
+        </div>
+      </div>
+
+      <div class="status">
+        <div id="statusLeft">시작을 누른 뒤 키패드로 한 자리씩 입력하세요.</div>
+        <div id="statusRight">정답 길이: {{ pi_total }}자리</div>
+      </div>
+
+      <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,0.10);padding-top:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <h3 style="margin:0;font-size:15px;">전체 랭킹 (자리수↑ 시간↓)</h3>
+          <button type="button" id="changeNickBtn"
+            style="height:30px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:inherit;font-size:12px;font-weight:700;cursor:pointer;">
+            닉네임 변경
+          </button>
+        </div>
+        <div id="globalRank" style="margin-top:10px;"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 정답(소수부) 1000자리는 서버에서 주입 -->
+  <script>
+    window.PI_DECIMALS = {{ pi_decimals|tojson }};
+    window.PI_TOTAL = {{ pi_total }};
+  </script>
+  <script src="/static/js/leaderboard.js"></script>
+  <script src="/static/js/pi_memory.js"></script>
+</body>
+</html>

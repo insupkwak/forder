@@ -245,6 +245,7 @@
     if (clearedStage > 0) {
       statusLeft.textContent = `틀렸습니다. 최고 단계는 ${clearedStage}자리입니다.`;
       addRecord(clearedStage);
+      submitToLeaderboard(clearedStage);
     } else {
       statusLeft.textContent = "틀렸습니다. 기록이 없습니다.";
     }
@@ -345,10 +346,41 @@
 
   submitBtn.addEventListener("click", submit);
 
+  // ---------- 전체 랭킹 연동 ----------
+  const RANK_GAME = "digit_sequence";
+  const rankBox = document.getElementById("globalRank");
+  const nickBtn = document.getElementById("changeNickBtn");
+
+  function rankFormat(it) {
+    return `${Math.round(it.primary)} 자리`;
+  }
+  function renderRank() {
+    if (window.Leaderboard && rankBox) {
+      window.Leaderboard.render(rankBox, RANK_GAME, "default", { format: rankFormat });
+    }
+  }
+  async function submitToLeaderboard(stage) {
+    if (!window.Leaderboard) return;
+    await window.Leaderboard.submit(RANK_GAME, {
+      mode: "default",
+      primary: stage
+    });
+    renderRank();
+  }
+  if (nickBtn) {
+    nickBtn.addEventListener("click", () => {
+      if (window.Leaderboard) {
+        window.Leaderboard.promptNickname();
+        renderRank();
+      }
+    });
+  }
+
   // ---------- init ----------
   function init() {
     renderRecords();
     goReady();
+    renderRank();
   }
 
   init();

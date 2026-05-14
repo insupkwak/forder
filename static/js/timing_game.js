@@ -61,6 +61,7 @@
     timerText.textContent = "0.00";
     resultText.textContent = "시작 버튼을 누르세요.";
     render();
+    renderRank();
   }
 
   function render() {
@@ -132,6 +133,7 @@
     save(scores);
 
     render();
+    submitToLeaderboard(diff, ms);
   }
 
   mainBtn.addEventListener("click", () => {
@@ -146,7 +148,41 @@
 
   homeBtn.addEventListener("click", () => (window.location.href = "/"));
 
+  // ---- 전체 랭킹 ----
+  const RANK_GAME = "timing";
+  const rankBox = document.getElementById("globalRank");
+  const nickBtn = document.getElementById("changeNickBtn");
+
+  function currentMode(){ return String(TARGET_MS); }
+  function rankFormat(it){
+    const ms = it.meta && it.meta.ms != null ? it.meta.ms : it.secondary;
+    return `오차 ${Math.round(it.primary)}ms · ${(ms/1000).toFixed(2)}s`;
+  }
+  function renderRank(){
+    if (window.Leaderboard && rankBox) {
+      window.Leaderboard.render(rankBox, RANK_GAME, currentMode(), { format: rankFormat });
+    }
+  }
+  async function submitToLeaderboard(diffMs, msTotal){
+    if (!window.Leaderboard) return;
+    await window.Leaderboard.submit(RANK_GAME, {
+      mode: currentMode(),
+      primary: diffMs,
+      secondary: msTotal,
+      meta: { ms: msTotal, target_ms: TARGET_MS }
+    });
+    renderRank();
+  }
+  if (nickBtn) {
+    nickBtn.addEventListener("click", () => {
+      if (window.Leaderboard) {
+        window.Leaderboard.promptNickname();
+        renderRank();
+      }
+    });
+  }
+
   // init
   setState("준비");
-  updateTargetLabel(); // 라벨/기록 로드 포함
+  updateTargetLabel(); // 라벨/기록 로드 포함 (renderRank도 호출됨)
 })();

@@ -207,6 +207,7 @@ function buildPad() {
       answerText.textContent = answer;
       statusText.textContent = `정답입니다. 총 ${tries}회`;
       hintText.textContent = "게임 종료! 새 게임을 눌러 다시 시작하세요.";
+      submitToLeaderboard(tries);
     } else {
       statusText.textContent = `시도 ${tries}회`;
       hintText.textContent = "다음 숫자를 선택하세요.";
@@ -223,7 +224,38 @@ function buildPad() {
     resetGame();
   });
 
+  // ---- 전체 랭킹 연동 ----
+  const RANK_GAME = "baseball";
+  const rankBox = document.getElementById("globalRank");
+  const nickBtn = document.getElementById("changeNickBtn");
+
+  function rankFormat(it) {
+    return `${Math.round(it.primary)} 회`;
+  }
+  function renderRank() {
+    if (window.Leaderboard && rankBox) {
+      window.Leaderboard.render(rankBox, RANK_GAME, "default", { format: rankFormat });
+    }
+  }
+  async function submitToLeaderboard(triesCount) {
+    if (!window.Leaderboard) return;
+    await window.Leaderboard.submit(RANK_GAME, {
+      mode: "default",
+      primary: triesCount
+    });
+    renderRank();
+  }
+  if (nickBtn) {
+    nickBtn.addEventListener("click", () => {
+      if (window.Leaderboard) {
+        window.Leaderboard.promptNickname();
+        renderRank();
+      }
+    });
+  }
+
   // 최초 실행
   buildPad();
   resetGame();
+  renderRank();
 })();

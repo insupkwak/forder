@@ -260,11 +260,46 @@ function buildDeck() {
     choicesEl.innerHTML = "";
 
     qTitle.textContent = "완료";
-      
+
     qHint.textContent = `모든 문제를 풀었습니다. (총 20 문제)`;
 
     resultText.classList.remove("ok", "no");
     resultText.textContent = `최종 점수 ${score}점 (정답 ${correct} / 오답 ${wrong})`;
+
+    submitToLeaderboard();
+  }
+
+  // ---- 전체 랭킹 연동 ----
+  const RANK_GAME = "capital_quiz";
+  const rankBox = document.getElementById("globalRank");
+  const nickBtn = document.getElementById("changeNickBtn");
+
+  function rankFormat(it) {
+    const correctN = (it.meta && it.meta.correct) != null ? it.meta.correct : "-";
+    return `${Math.round(it.primary)} 점 (${correctN} 정답)`;
+  }
+  function renderRank() {
+    if (window.Leaderboard && rankBox) {
+      window.Leaderboard.render(rankBox, RANK_GAME, "default", { format: rankFormat });
+    }
+  }
+  async function submitToLeaderboard() {
+    if (!window.Leaderboard) return;
+    await window.Leaderboard.submit(RANK_GAME, {
+      mode: "default",
+      primary: score,
+      secondary: correct,
+      meta: { correct: correct, wrong: wrong }
+    });
+    renderRank();
+  }
+  if (nickBtn) {
+    nickBtn.addEventListener("click", () => {
+      if (window.Leaderboard) {
+        window.Leaderboard.promptNickname();
+        renderRank();
+      }
+    });
   }
 
   function loadQuestion() {
@@ -360,4 +395,5 @@ function buildDeck() {
 
   // 시작
   reset();
+  renderRank();
 })();

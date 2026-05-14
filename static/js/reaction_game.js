@@ -175,6 +175,7 @@
 
     setKpis();
     renderHistory(); // 평균기록 Top10 표시
+    submitToLeaderboard(avg);
   }
 
   function start() {
@@ -251,7 +252,35 @@
   startBtn.addEventListener("click", start);
   resetBtn.addEventListener("click", reset);
 
-  diffSelect.addEventListener("change", () => reset());
+  // ---- 전체 랭킹 ----
+  const RANK_GAME = "reaction";
+  const rankBox = document.getElementById("globalRank");
+  const nickBtn = document.getElementById("changeNickBtn");
+
+  function currentMode(){ return String(diffSelect.value); }
+  function rankFormat(it){ return `${Math.round(it.primary)} ms`; }
+  function renderRank(){
+    if (window.Leaderboard && rankBox) {
+      window.Leaderboard.render(rankBox, RANK_GAME, currentMode(), { format: rankFormat });
+    }
+  }
+  async function submitToLeaderboard(avgMs){
+    if (!window.Leaderboard) return;
+    await window.Leaderboard.submit(RANK_GAME, {
+      mode: currentMode(),
+      primary: avgMs
+    });
+    renderRank();
+  }
+  if (nickBtn) {
+    nickBtn.addEventListener("click", () => {
+      if (window.Leaderboard) {
+        window.Leaderboard.promptNickname();
+        renderRank();
+      }
+    });
+  }
+  diffSelect.addEventListener("change", () => { reset(); renderRank(); });
 
   // init
   (function init() {
@@ -261,5 +290,6 @@
     setState("준비");
     setKpis();
     renderHistory();
+    renderRank();
   })();
 })();

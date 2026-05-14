@@ -258,9 +258,21 @@
 
 
       <div class="history" id="history"></div>
+
+      <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,0.10);padding-top:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <h3 style="margin:0;font-size:15px;">전체 랭킹 (난이도별 · 빠른 시간순)</h3>
+          <button type="button" id="changeNickBtn"
+            style="height:30px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:inherit;font-size:12px;font-weight:700;cursor:pointer;">
+            닉네임 변경
+          </button>
+        </div>
+        <div id="globalRank" style="margin-top:10px;"></div>
+      </div>
     </div>
   </div>
 
+  <script src="/static/js/leaderboard.js"></script>
   <script src="/static/js/number_order.js"></script>
 </body>
 </html>

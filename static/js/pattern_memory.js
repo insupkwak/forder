@@ -275,6 +275,7 @@
     scores = scores.slice(0, 10);
     saveScores(scores);
     renderHistory();
+    submitToLeaderboard(wins, time_ms);
   }
 
   function markWrong(){
@@ -431,6 +432,39 @@ startBtn.addEventListener("click", () => {
     loadAndShowBest();
   });
 
+  // ---- 전체 랭킹 ----
+  const RANK_GAME = "pattern_memory";
+  const rankBox = document.getElementById("globalRank");
+  const nickBtn = document.getElementById("changeNickBtn");
+
+  function currentMode(){ return String(n); }
+  function rankFormat(it){
+    return `${Math.round(it.primary)}/10 · ${(it.secondary/1000).toFixed(1)}s`;
+  }
+  function renderRank(){
+    if (window.Leaderboard && rankBox) {
+      window.Leaderboard.render(rankBox, RANK_GAME, currentMode(), { format: rankFormat });
+    }
+  }
+  async function submitToLeaderboard(winsN, timeMs){
+    if (!window.Leaderboard) return;
+    await window.Leaderboard.submit(RANK_GAME, {
+      mode: currentMode(),
+      primary: winsN,
+      secondary: timeMs
+    });
+    renderRank();
+  }
+  if (nickBtn) {
+    nickBtn.addEventListener("click", () => {
+      if (window.Leaderboard) {
+        window.Leaderboard.promptNickname();
+        renderRank();
+      }
+    });
+  }
+  diffSelect.addEventListener("change", () => setTimeout(renderRank, 0));
+
   // init
   (function init(){
     parseDiff();
@@ -440,5 +474,6 @@ startBtn.addEventListener("click", () => {
     kpiTime.textContent = "0.0 s";
     setState("준비");
     statusLeft.textContent = "시작을 누르면 패턴이 3초간 표시됩니다.";
+    renderRank();
   })();
 })();

@@ -170,6 +170,7 @@ function setHint(text) {
         updateBestUI();
         pushRow("기록", "Best 갱신");
       }
+      submitToLeaderboard(tries);
       return;
     }
 
@@ -219,8 +220,38 @@ function setHint(text) {
 
   newGameBtn.addEventListener("click", newGame);
   submitBtn.addEventListener("click", submit);
-  levelEl.addEventListener("change", newGame);
+  levelEl.addEventListener("change", () => { newGame(); renderRank(); });
+
+  // ---- 전체 랭킹 ----
+  const RANK_GAME = "updown";
+  const rankBox = document.getElementById("globalRank");
+  const nickBtn = document.getElementById("changeNickBtn");
+
+  function currentMode(){ return String(maxN); }
+  function rankFormat(it){ return `${Math.round(it.primary)} 회`; }
+  function renderRank(){
+    if (window.Leaderboard && rankBox) {
+      window.Leaderboard.render(rankBox, RANK_GAME, currentMode(), { format: rankFormat });
+    }
+  }
+  async function submitToLeaderboard(triesCount){
+    if (!window.Leaderboard) return;
+    await window.Leaderboard.submit(RANK_GAME, {
+      mode: currentMode(),
+      primary: triesCount
+    });
+    renderRank();
+  }
+  if (nickBtn) {
+    nickBtn.addEventListener("click", () => {
+      if (window.Leaderboard) {
+        window.Leaderboard.promptNickname();
+        renderRank();
+      }
+    });
+  }
 
   buildPad();
   newGame();
+  renderRank();
 })();

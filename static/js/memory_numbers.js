@@ -208,6 +208,7 @@
 
     renderBest();
     renderHistory();
+    submitToLeaderboard(hit, time_ms);
   }
 
   // ✅ 틀리면 바로 끝
@@ -282,7 +283,44 @@
     renderKpis();
     renderBest();
     renderHistory();
+    renderRank();
   });
+
+  // ---- 전체 랭킹 연동 ----
+  const RANK_GAME = "memory_numbers";
+  const rankBox = document.getElementById("globalRank");
+  const nickBtn = document.getElementById("changeNickBtn");
+
+  function currentMode() {
+    return `${n}x${n}`;
+  }
+  function rankFormat(it) {
+    const t = (it.secondary / 1000).toFixed(3);
+    return `${Math.round(it.primary)}/${n * n} · ${t}s`;
+  }
+  function renderRank() {
+    if (window.Leaderboard && rankBox) {
+      window.Leaderboard.render(rankBox, RANK_GAME, currentMode(), { format: rankFormat });
+    }
+  }
+  async function submitToLeaderboard(hitCount, timeMs) {
+    if (!window.Leaderboard) return;
+    await window.Leaderboard.submit(RANK_GAME, {
+      mode: currentMode(),
+      primary: hitCount,
+      secondary: timeMs,
+      meta: { total: total }
+    });
+    renderRank();
+  }
+  if (nickBtn) {
+    nickBtn.addEventListener("click", () => {
+      if (window.Leaderboard) {
+        window.Leaderboard.promptNickname();
+        renderRank();
+      }
+    });
+  }
 
   startBtn.addEventListener("click", () => {
     if (phase === "show" || phase === "play") return;
@@ -312,5 +350,6 @@
     renderKpis();
     renderBest();
     renderHistory();
+    renderRank();
   })();
 })();

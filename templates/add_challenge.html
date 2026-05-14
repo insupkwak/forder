@@ -7,10 +7,6 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
   <style>
-    /* =========================
-       Memory Numbers : Page CSS
-    ========================= */
-
     .wrap{ max-width: 980px; }
 
     .panel{
@@ -32,7 +28,53 @@
     .head h1{ margin:0; font-size: 22px; }
     .mini{ opacity:0.7; font-size: 12px; }
 
-    /* 상태 표시 영역 */
+    .controls{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      flex-wrap: wrap;
+    }
+    .controls-left{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; }
+    .controls-right{ display:flex; align-items:center; gap: 10px; }
+
+    .select{
+      min-width: 170px;
+      height: 44px;
+      padding: 0 44px 0 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-weight: 900;
+      font-size: 14px;
+      outline: none;
+
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.85) 50%),
+        linear-gradient(135deg, rgba(255,255,255,0.85) 50%, transparent 50%),
+        linear-gradient(to right, rgba(255,255,255,0.10), rgba(255,255,255,0.10));
+      background-position:
+        calc(100% - 20px) 50%,
+        calc(100% - 14px) 50%,
+        calc(100% - 40px) 50%;
+      background-size:
+        6px 6px,
+        6px 6px,
+        1px 22px;
+      background-repeat: no-repeat;
+    }
+    .select option{ background:#fff; color:#000; }
+
     .stage-box{
       margin-top: 12px;
       border-radius: 18px;
@@ -49,14 +91,14 @@
       border: 1px solid rgba(255,255,255,0.10);
       background: rgba(0,0,0,0.12);
       padding: 14px;
-      min-height: 92px;
+      min-height: 120px;
       display:flex;
       align-items:center;
       justify-content:center;
       text-align:center;
       font-weight: 900;
       letter-spacing: 2px;
-      font-size: 34px;
+      font-size: 52px;
       user-select:none;
     }
     .big-display.small{ font-size: 26px; letter-spacing: 1px; }
@@ -93,12 +135,11 @@
       border-color: rgba(231,76,60,0.35);
     }
 
-    /* KPI 3칸 한줄 고정 + 각 칸 2줄 */
     .kpis{
       margin-top: 12px;
       display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
       width: 100%;
     }
     .kpi{
@@ -133,15 +174,14 @@
       text-overflow: ellipsis;
     }
     @media (max-width: 640px){
-      .kpis{ gap: 8px; }
+      .kpis{ gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .kpi{ padding: 9px 10px; }
       .kpi .t{ font-size: 11px; }
       .kpi .v{ font-size: 14px; }
-      .big-display{ font-size: 30px; }
+      .big-display{ font-size: 40px; }
       .big-display.small{ font-size: 22px; }
     }
 
-    /* 키패드 */
     .pad-wrap{
       margin-top: 12px;
       border-radius: 18px;
@@ -151,35 +191,38 @@
     }
 
     .input-box{
-      border-radius: 16px;
+      border-radius: 18px;
       border: 1px solid rgba(255,255,255,0.10);
       background: rgba(0,0,0,0.12);
-      padding: 12px 14px;
+      padding: 14px 16px;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size: 22px;
+      font-size: 28px;
       font-weight: 900;
       letter-spacing: 2px;
-      min-height: 56px;
+      min-height: 72px;
       user-select:none;
     }
 
     .pad{
-      margin-top: 12px;
+      margin-top: 14px;
       display:grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
+      gap: 12px;
+      max-width: 360px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .pad-btn{
-      height: 56px;
-      border-radius: 16px;
+      height: 74px;
+      border-radius: 18px;
       border: 1px solid rgba(255,255,255,0.16);
       background: rgba(255,255,255,0.06);
       color: inherit;
       font-weight: 900;
-      font-size: 18px;
+      font-size: 20px;
       cursor: pointer;
       display:flex;
       align-items:center;
@@ -188,24 +231,43 @@
       -webkit-tap-highlight-color: transparent;
     }
     .pad-btn:active{ transform: scale(0.99); }
-    .pad-btn[disabled]{ opacity: 0.5; cursor:not-allowed; }
+    .pad-btn[disabled]{ opacity: 0.45; cursor:not-allowed; }
+
+    .pad-actions{
+      margin-top: 16px;
+      display:flex;
+      gap: 12px;
+      max-width: 360px;
+      margin-left:auto;
+      margin-right:auto;
+    }
+    .pad-actions .pad-btn{
+      flex: 1 1 0;
+      height: 58px;
+      font-size: 16px;
+      border-radius: 18px;
+    }
 
     .pad-btn.primary{
       background: linear-gradient(135deg, rgba(46,204,113,0.35), rgba(46,204,113,0.18));
       border-color: rgba(46,204,113,0.6);
       box-shadow: 0 6px 18px rgba(46,204,113,0.25);
     }
+    .pad-btn.info{
+      background: linear-gradient(135deg, rgba(52,152,219,0.42), rgba(52,152,219,0.18));
+      border-color: rgba(52,152,219,0.65);
+      box-shadow: 0 8px 22px rgba(52,152,219,0.22);
+    }
     .pad-btn.ghost{
       background: rgba(255,255,255,0.04);
     }
-    .pad-actions{
-      margin-top: 10px;
-      display:flex;
-      gap: 10px;
-    }
-    .pad-actions .pad-btn{ flex: 1 1 0; height: 52px; }
 
-    /* 기록 테이블 */
+    @media (max-width: 640px){
+      .pad, .pad-actions{ max-width: 100%; }
+      .pad-btn{ height: 70px; }
+      .input-box{ font-size: 24px; min-height: 68px; }
+    }
+
     .score-board{
       margin-top: 14px;
       border-radius: 16px;
@@ -231,108 +293,14 @@
     }
     .score-table th{ font-weight: 700; opacity: 0.8; }
 
-    /* top 3 rank highlight */
     .score-table tbody tr:nth-child(1) td:first-child{ color: gold; font-weight: 900; }
     .score-table tbody tr:nth-child(2) td:first-child{ color: silver; font-weight: 900; }
     .score-table tbody tr:nth-child(3) td:first-child{ color: #cd7f32; font-weight: 900; }
-  
-  
-  /* 입력창을 이미지처럼 더 크게/중앙 */
-.input-box{
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(0,0,0,0.12);
-  padding: 14px 16px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size: 26px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  min-height: 72px;
-  user-select:none;
-}
 
-/* 키패드 버튼을 좀 더 큼직하게 */
-.pad{
-  margin-top: 14px;
-  display:grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  max-width: 360px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.pad-btn{
-  height: 74px;
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.16);
-  background: rgba(255,255,255,0.06);
-  color: inherit;
-  font-weight: 900;
-  font-size: 20px;
-  cursor: pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  user-select:none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.pad-btn:active{ transform: scale(0.99); }
-.pad-btn[disabled]{ opacity: 0.45; cursor:not-allowed; }
-
-/* 아래 액션 버튼 (스킵/확인) */
-.pad-actions{
-  margin-top: 16px;
-  display:flex;
-  gap: 12px;
-  max-width: 360px;
-  margin-left:auto;
-  margin-right:auto;
-}
-.pad-actions .pad-btn{
-  flex: 1 1 0;
-  height: 58px;
-  font-size: 16px;
-  border-radius: 18px;
-}
-
-/* 확인(파랑) */
-.pad-btn.info{
-  background: linear-gradient(135deg, rgba(52,152,219,0.42), rgba(52,152,219,0.18));
-  border-color: rgba(52,152,219,0.65);
-  box-shadow: 0 8px 22px rgba(52,152,219,0.22);
-}
-
-/* 스킵(노랑) */
-.pad-btn.warn{
-  background: linear-gradient(135deg, rgba(241,196,15,0.42), rgba(241,196,15,0.18));
-  border-color: rgba(241,196,15,0.65);
-  box-shadow: 0 8px 22px rgba(241,196,15,0.18);
-}
-
-/* CLR / ← 는 살짝 덜 강조 */
-.pad-btn.ghost{
-  background: rgba(255,255,255,0.04);
-}
-
-/* 모바일에서 키패드 꽉 차게 */
-@media (max-width: 640px){
-  .pad, .pad-actions{
-    max-width: 100%;
-  }
-  .pad-btn{ height: 70px; }
-  .input-box{ font-size: 24px; min-height: 68px; }
-}
-
-  .header{
-  position: relative;   /* sticky/fixed 제거 */
-  width: 100%;
-}
-
-  
+    .header{
+      position: relative;
+      width: 100%;
+    }
   </style>
 </head>
 
@@ -356,67 +324,78 @@
     <section class="panel">
       <div class="head">
         <div>
-          <h1>숫자 외우기</h1>
-          <div class="mini">10초 동안 숫자를 외우고, 키패드로 입력하세요. 맞추면 자리수가 계속 늘어납니다.</div>
+          <h1>더하기 챌린지</h1>
+          <div class="mini">숫자 10개가 1초씩 표시됩니다. 모두 더한 합을 키패드로 입력하세요.</div>
         </div>
-        <div class="mini" id="bestText">Best Stage: -</div>
+        <div class="mini" id="bestText">Best: -</div>
+      </div>
+
+      <div class="controls">
+        <div class="controls-left">
+          <select class="select" id="modeSelect">
+            <option value="1" selected>1자리 (0~9)</option>
+            <option value="2">2자리 (10~99)</option>
+            <option value="3">3자리 (100~999)</option>
+          </select>
+        </div>
+        <div class="controls-right">
+          <span class="mini">정답을 맞히면 다음 라운드로 진행됩니다.</span>
+        </div>
       </div>
 
       <div class="stage-box">
         <div class="big-display" id="displayBox">READY</div>
         <div class="subrow">
-          <div id="statusLeft">시작을 누르세요.</div>
+          <div id="statusLeft">모드를 선택하고 시작을 누르세요.</div>
           <div><span class="badge" id="modeBadge">READY</span></div>
         </div>
       </div>
 
+      <div class="pad-wrap">
+        <div class="input-box" id="inputBox">-</div>
 
+        <div class="pad" id="pad">
+          <button class="pad-btn" data-key="1">1</button>
+          <button class="pad-btn" data-key="2">2</button>
+          <button class="pad-btn" data-key="3">3</button>
 
-<div class="pad-wrap">
-  <div class="input-box" id="inputBox">-</div>
+          <button class="pad-btn" data-key="4">4</button>
+          <button class="pad-btn" data-key="5">5</button>
+          <button class="pad-btn" data-key="6">6</button>
 
-  <div class="pad" id="pad">
-    <button class="pad-btn" data-key="1">1</button>
-    <button class="pad-btn" data-key="2">2</button>
-    <button class="pad-btn" data-key="3">3</button>
+          <button class="pad-btn" data-key="7">7</button>
+          <button class="pad-btn" data-key="8">8</button>
+          <button class="pad-btn" data-key="9">9</button>
 
-    <button class="pad-btn" data-key="4">4</button>
-    <button class="pad-btn" data-key="5">5</button>
-    <button class="pad-btn" data-key="6">6</button>
-
-    <button class="pad-btn" data-key="7">7</button>
-    <button class="pad-btn" data-key="8">8</button>
-    <button class="pad-btn" data-key="9">9</button>
-
-    <button class="pad-btn ghost" data-action="clr">CLR</button>
-    <button class="pad-btn" data-key="0">0</button>
-    <button class="pad-btn ghost" data-action="back">←</button>
-  </div>
-
-<div class="pad-actions">
-  <button class="pad-btn primary" id="startBtn">시작</button>
-  <button class="pad-btn warn" id="skipBtn" disabled>스킵</button>
-  <button class="pad-btn info" id="submitBtn" disabled>확인</button>
-</div>
-
-
-      <div class="kpis">
-        <div class="kpi">
-          <div class="t">단계</div>
-          <div class="v" id="kStage">5</div>
+          <button class="pad-btn ghost" data-action="clr">CLR</button>
+          <button class="pad-btn" data-key="0">0</button>
+          <button class="pad-btn ghost" data-action="back">←</button>
         </div>
-        <div class="kpi">
-          <div class="t">카운트다운</div>
-          <div class="v" id="kTimer">10s</div>
+
+        <div class="pad-actions">
+          <button class="pad-btn primary" id="startBtn">시작</button>
+          <button class="pad-btn info" id="submitBtn" disabled>확인</button>
         </div>
-        <div class="kpi">
-          <div class="t">상태</div>
-          <div class="v" id="kState">READY</div>
+
+        <div class="kpis">
+          <div class="kpi">
+            <div class="t">라운드</div>
+            <div class="v" id="kRound">0</div>
+          </div>
+          <div class="kpi">
+            <div class="t">진행</div>
+            <div class="v" id="kProgress">0 / 10</div>
+          </div>
+          <div class="kpi">
+            <div class="t">현재 모드</div>
+            <div class="v" id="kMode">1자리</div>
+          </div>
+          <div class="kpi">
+            <div class="t">상태</div>
+            <div class="v" id="kState">READY</div>
+          </div>
         </div>
       </div>
-
-</div>
-
 
       <div class="score-board">
         <div class="score-title">내 기록 TOP 10 (이 브라우저)</div>
@@ -425,7 +404,8 @@
             <tr>
               <th>순위</th>
               <th>날짜시간</th>
-              <th>단계</th>
+              <th>모드</th>
+              <th>라운드</th>
             </tr>
           </thead>
           <tbody id="scoreTableBody"></tbody>
@@ -434,11 +414,16 @@
 
       <div class="score-board" style="margin-top:14px;">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;">
-          <div class="score-title" style="margin:0;">전체 랭킹 (단계 높은순)</div>
+          <div class="score-title" style="margin:0;">전체 랭킹 (라운드 많은순)</div>
           <button type="button" id="changeNickBtn"
             style="height:30px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:inherit;font-size:12px;font-weight:700;cursor:pointer;">
             닉네임 변경
           </button>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+          <button type="button" class="pad-btn ghost rankTab" data-rankmode="1" style="height:34px;font-size:13px;padding:0 14px;flex:0 0 auto;">1자리</button>
+          <button type="button" class="pad-btn ghost rankTab" data-rankmode="2" style="height:34px;font-size:13px;padding:0 14px;flex:0 0 auto;">2자리</button>
+          <button type="button" class="pad-btn ghost rankTab" data-rankmode="3" style="height:34px;font-size:13px;padding:0 14px;flex:0 0 auto;">3자리</button>
         </div>
         <div id="globalRank"></div>
       </div>
@@ -446,6 +431,6 @@
   </div>
 
   <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/digit_sequence_game.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/add_challenge.js') }}"></script>
 </body>
 </html>

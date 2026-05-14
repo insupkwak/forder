@@ -162,6 +162,7 @@
 
     renderBest();
     renderHistory();
+    submitToLeaderboard(ms);
   }
 
   function onCellClick(e) {
@@ -204,7 +205,41 @@
     renderKpis();
     renderBest();
     renderHistory();
+    renderRank();
   });
+
+  // ---- 전체 랭킹 ----
+  const RANK_GAME = "number_order";
+  const rankBox = document.getElementById("globalRank");
+  const nickBtn = document.getElementById("changeNickBtn");
+
+  function currentMode() {
+    return `${rows}x${cols}`;
+  }
+  function rankFormat(it) {
+    return `${(it.primary / 1000).toFixed(3)} s`;
+  }
+  function renderRank() {
+    if (window.Leaderboard && rankBox) {
+      window.Leaderboard.render(rankBox, RANK_GAME, currentMode(), { format: rankFormat });
+    }
+  }
+  async function submitToLeaderboard(timeMs) {
+    if (!window.Leaderboard) return;
+    await window.Leaderboard.submit(RANK_GAME, {
+      mode: currentMode(),
+      primary: timeMs
+    });
+    renderRank();
+  }
+  if (nickBtn) {
+    nickBtn.addEventListener("click", () => {
+      if (window.Leaderboard) {
+        window.Leaderboard.promptNickname();
+        renderRank();
+      }
+    });
+  }
 
   startBtn.addEventListener("click", () => {
     if (!running) start();
@@ -222,5 +257,6 @@
     renderKpis();
     renderBest();
     renderHistory();
+    renderRank();
   })();
 })();

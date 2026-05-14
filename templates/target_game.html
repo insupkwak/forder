@@ -422,7 +422,7 @@ canvas{
 
       </div>
 <div class="score-board">
-  
+  <div class="score-title">내 기록 TOP 10 (이 브라우저)</div>
   <table class="score-table">
     <thead>
 <tr>
@@ -437,10 +437,22 @@ canvas{
   </table>
 </div>
 
+<div class="score-board" style="margin-top:14px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;">
+    <div class="score-title" style="margin:0;">전체 랭킹 (점수 높은순)</div>
+    <button type="button" id="changeNickBtn"
+      style="height:30px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:inherit;font-size:12px;font-weight:700;cursor:pointer;">
+      닉네임 변경
+    </button>
+  </div>
+  <div id="globalRank"></div>
+</div>
+
       </div>
     </section>
   </div>
 
+  <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
   <script src="{{ url_for('static', filename='js/target_shot.js') }}"></script>
 </body>
 </html>

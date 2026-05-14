@@ -488,6 +488,7 @@ function renderScoreTable(){
 
       // ✅ 최고기록 TOP10에 반영
       addScoreRecord(totalScore);
+      submitToLeaderboard(totalScore);
 
       locked = false;
       fireBtn.disabled = true;
@@ -630,6 +631,34 @@ function renderScoreTable(){
     if (e.key === "r" || e.key === "R") resetGame();
   });
 
+  // ---- 전체 랭킹 ----
+  const RANK_GAME = "target";
+  const rankBox = document.getElementById("globalRank");
+  const nickBtn = document.getElementById("changeNickBtn");
+
+  function rankFormat(it){ return `${Math.round(it.primary)} 점`; }
+  function renderRank(){
+    if (window.Leaderboard && rankBox) {
+      window.Leaderboard.render(rankBox, RANK_GAME, "default", { format: rankFormat });
+    }
+  }
+  async function submitToLeaderboard(score){
+    if (!window.Leaderboard) return;
+    await window.Leaderboard.submit(RANK_GAME, {
+      mode: "default",
+      primary: score
+    });
+    renderRank();
+  }
+  if (nickBtn) {
+    nickBtn.addEventListener("click", () => {
+      if (window.Leaderboard) {
+        window.Leaderboard.promptNickname();
+        renderRank();
+      }
+    });
+  }
+
   function init() {
     const s = ensureCanvas();
     CW = s.w;
@@ -639,6 +668,7 @@ function renderScoreTable(){
     renderScoreTable(); // ✅ 최초 로드 시 표 채우기
     updateUI();
     redraw();
+    renderRank();
   }
 
   init();

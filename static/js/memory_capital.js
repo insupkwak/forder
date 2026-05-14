@@ -173,7 +173,9 @@ function applyDifficulty() {
     started = false;
     setStatus("🎉 완료!");
     doneText.style.display = "block";
-    doneText.textContent = `완료! 시도 ${moves}회`;
+    const elapsedMs = Date.now() - t0;
+    doneText.textContent = `완료! 시도 ${moves}회 · ${(elapsedMs/1000).toFixed(1)}s`;
+    submitToLeaderboard(elapsedMs);
   }
 
   function onTileClick(e) {
@@ -284,6 +286,48 @@ function applyDifficulty() {
   startBtn.addEventListener("click", startGame);
   restartBtn.addEventListener("click", restartGame);
 
+  // ===== 전체 랭킹 =====
+  const RANK_GAME = "memory_capital";
+  const rankBox = document.getElementById("globalRank");
+  const nickBtn = document.getElementById("changeNickBtn");
+
+  function currentMode() {
+    return `${grid}x${grid}`;
+  }
+  function rankFormat(it) {
+    const m = it.meta || {};
+    const t = (it.primary / 1000).toFixed(1);
+    return `${t}s · ${m.moves != null ? m.moves : Math.round(it.secondary)}회`;
+  }
+  function renderRank() {
+    if (window.Leaderboard && rankBox) {
+      window.Leaderboard.render(rankBox, RANK_GAME, currentMode(), { format: rankFormat });
+    }
+  }
+  async function submitToLeaderboard(timeMs) {
+    if (!window.Leaderboard) return;
+    await window.Leaderboard.submit(RANK_GAME, {
+      mode: currentMode(),
+      primary: timeMs,
+      secondary: moves,
+      meta: { moves: moves, grid: grid }
+    });
+    renderRank();
+  }
+  if (nickBtn) {
+    nickBtn.addEventListener("click", () => {
+      if (window.Leaderboard) {
+        window.Leaderboard.promptNickname();
+        renderRank();
+      }
+    });
+  }
+  difficultySelect.addEventListener("change", () => {
+    // 난이도가 바뀌면 해당 모드의 랭킹으로 전환 (restartGame이 grid를 갱신)
+    setTimeout(renderRank, 0);
+  });
+
   // ✅ 초기 화면: 설정값 기준으로 “섞어둔 보드”만 미리 보여주기
   restartGame();
+  renderRank();
 })();
